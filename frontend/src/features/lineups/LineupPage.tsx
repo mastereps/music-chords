@@ -213,7 +213,7 @@ export function LineupPage() {
             <button
               type="button"
               onClick={() => handleSelectLineup('new')}
-              className="min-h-12 rounded-2xl border border-stone-300 px-4 py-3 text-sm font-semibold text-stone-700 transition hover:border-brand-500 hover:text-brand-700 dark:border-stone-700 dark:text-stone-200"
+              className="min-h-12 w-full rounded-2xl border border-stone-300 px-4 py-3 text-sm font-semibold text-stone-700 transition hover:border-brand-500 hover:text-brand-700 dark:border-stone-700 dark:text-stone-200 md:w-auto"
             >
               New lineup
             </button>
@@ -286,7 +286,7 @@ export function LineupPage() {
                   key={song.id}
                   className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-4 dark:border-stone-800 dark:bg-stone-950/60"
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex flex-wrap items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-700 text-sm font-semibold text-white">
                       {index + 1}
                     </div>
@@ -296,12 +296,12 @@ export function LineupPage() {
                       </Link>
                       <p className="mt-1 truncate text-sm text-stone-600 dark:text-stone-300">{song.artist || 'Unknown artist'}</p>
                     </div>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-stone-900 dark:text-brand-200">
+                    <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-stone-900 dark:text-brand-200">
                       {song.key}
                     </span>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <button
                       type="button"
                       onClick={() => moveSong(index, -1)}
@@ -368,28 +368,28 @@ export function LineupPage() {
                     key={song.id}
                     className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-4 dark:border-stone-800 dark:bg-stone-950/60"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
                         <Link to={`/songs/${song.slug}`} className="block truncate text-base font-semibold text-stone-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-200">
                           {song.title}
                         </Link>
                         <p className="mt-1 truncate text-sm text-stone-600 dark:text-stone-300">{song.artist || 'Unknown artist'}</p>
                       </div>
-                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-stone-900 dark:text-brand-200">
+                      <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-stone-900 dark:text-brand-200">
                         {song.key}
                       </span>
                     </div>
 
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex flex-wrap gap-2 text-xs text-stone-500 dark:text-stone-400">
-                        {song.category ? <span className="rounded-full bg-white px-3 py-1 dark:bg-stone-900">{song.category.name}</span> : null}
-                        {song.language ? <span className="rounded-full bg-white px-3 py-1 dark:bg-stone-900">{song.language}</span> : null}
+                    <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                      <div className="flex min-w-0 flex-wrap gap-2 text-xs text-stone-500 dark:text-stone-400">
+                        {song.category ? <span className="max-w-[8rem] truncate rounded-full bg-white px-3 py-1 dark:bg-stone-900 sm:max-w-none">{song.category.name}</span> : null}
+                        {song.language ? <span className="max-w-[8rem] truncate rounded-full bg-white px-3 py-1 dark:bg-stone-900 sm:max-w-none">{song.language}</span> : null}
                       </div>
                       <button
                         type="button"
                         onClick={() => handleAddSong(song)}
                         disabled={isAdded}
-                        className="min-h-11 rounded-2xl bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-600 dark:disabled:bg-stone-700 dark:disabled:text-stone-300"
+                        className="min-h-11 w-full rounded-2xl bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-600 dark:disabled:bg-stone-700 dark:disabled:text-stone-300 sm:w-auto"
                       >
                         {isAdded ? 'Added' : 'Add song'}
                       </button>
