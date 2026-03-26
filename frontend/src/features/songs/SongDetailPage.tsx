@@ -11,6 +11,7 @@ import { FontSizeControls } from '../../components/FontSizeControls';
 import { RevisionList } from '../../components/RevisionList';
 import { SuggestionForm } from '../../components/SuggestionForm';
 import { TransposeControls } from '../../components/TransposeControls';
+import { ActiveLineupFab } from '../lineups/ActiveLineupFab';
 import { formatDate } from '../../utils/date';
 
 export function SongDetailPage() {
@@ -70,7 +71,7 @@ export function SongDetailPage() {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid gap-4 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
       <section className="space-y-4">
         <div className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-panel dark:border-stone-800 dark:bg-stone-900">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -117,6 +118,8 @@ export function SongDetailPage() {
           <SuggestionForm onSubmit={(input) => apiClient.suggestCorrection(song.id, input)} />
         )}
       </aside>
+
+      <ActiveLineupFab currentSongSlug={song.slug} />
     </div>
   );
 }

@@ -25,6 +25,18 @@ export function AppLayout() {
             <p className="truncate text-xs uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">Music Chords</p>
           </Link>
           <div className="flex items-center gap-2">
+            <NavLink
+              to="/lineups"
+              className={({ isActive }) =>
+                `rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                  isActive
+                    ? 'border-brand-500 bg-brand-50 text-brand-700 dark:border-brand-400 dark:bg-brand-900/40 dark:text-brand-100'
+                    : 'border-stone-300 text-stone-700 hover:border-brand-500 hover:text-brand-700 dark:border-stone-700 dark:text-stone-200'
+                }`
+              }
+            >
+              Lineups
+            </NavLink>
             {user?.role && (user.role === 'admin' || user.role === 'editor') ? (
               <NavLink
                 to="/admin"
