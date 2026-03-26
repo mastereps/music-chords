@@ -1,6 +1,6 @@
 import type { Tag } from '@music-chords/shared';
 
-import { query } from '../../config/db';
+import { query } from '../../config/db.js';
 
 interface TagRow {
   id: number;

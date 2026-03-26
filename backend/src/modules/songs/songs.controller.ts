@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 
 import type { SongInput } from '@music-chords/shared';
 
-import { AppError, assertFound } from '../../utils/http';
+import { AppError, assertFound } from '../../utils/http.js';
 import {
   createSong as createSongRecord,
   createSuggestion,
@@ -12,8 +12,8 @@ import {
   getSongRevisions,
   listSongs,
   updateSong as updateSongRecord
-} from './songs.service';
-import { songSchema, songSearchSchema, suggestionSchema } from './songs.schemas';
+} from './songs.service.js';
+import { songSchema, songSearchSchema, suggestionSchema } from './songs.schemas.js';
 
 function canViewDrafts(req: Request) {
   return req.authRole === 'admin' || req.authRole === 'editor';

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { loginSchema } from '../modules/auth/auth.schemas';
-import { songSchema, songSearchSchema, suggestionSchema } from '../modules/songs/songs.schemas';
+import { loginSchema } from '../modules/auth/auth.schemas.js';
+import { songSchema, songSearchSchema, suggestionSchema } from '../modules/songs/songs.schemas.js';
 
 describe('songSchema', () => {
   it('accepts a valid song payload', () => {

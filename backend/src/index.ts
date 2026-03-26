@@ -1,7 +1,7 @@
-import { createApp } from './app';
-import { pool } from './config/db';
-import { env } from './config/env';
-import { logger } from './config/logger';
+import { createApp } from './app.js';
+import { pool } from './config/db.js';
+import { env } from './config/env.js';
+import { logger } from './config/logger.js';
 
 const app = createApp();
 

@@ -1,7 +1,7 @@
 import type { Category } from '@music-chords/shared';
 
-import { query } from '../../config/db';
-import { AppError, assertFound } from '../../utils/http';
+import { query } from '../../config/db.js';
+import { AppError, assertFound } from '../../utils/http.js';
 
 interface CategoryRow {
   id: number;

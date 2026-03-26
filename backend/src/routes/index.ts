@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
-import { login, logout, me } from '../modules/auth/auth.controller';
+import { login, logout, me } from '../modules/auth/auth.controller.js';
 import {
   createCategory,
   deleteCategory,
   getCategories,
   updateCategory
-} from '../modules/categories/categories.controller';
+} from '../modules/categories/categories.controller.js';
 import {
   createSong,
   deleteSong,
@@ -16,9 +16,9 @@ import {
   searchSongs,
   suggestSongCorrection,
   updateSong
-} from '../modules/songs/songs.controller';
-import { createTag, getTags } from '../modules/tags/tags.controller';
-import { requireAuth, requireRole } from '../middleware/auth';
+} from '../modules/songs/songs.controller.js';
+import { createTag, getTags } from '../modules/tags/tags.controller.js';
+import { requireAuth, requireRole } from '../middleware/auth.js';
 
 export const apiRouter = Router();
 

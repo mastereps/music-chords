@@ -12,8 +12,8 @@ import type {
 } from '@music-chords/shared';
 import type { PoolClient } from 'pg';
 
-import { pool, query } from '../../config/db';
-import { AppError, assertFound } from '../../utils/http';
+import { pool, query } from '../../config/db.js';
+import { AppError, assertFound } from '../../utils/http.js';
 
 interface SongSearchFilters {
   q?: string;
