@@ -93,11 +93,11 @@ export function AdminDashboardPage() {
           <p className="text-xs uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">Admin area</p>
           <h2 className="text-2xl font-semibold">Song management</h2>
         </div>
-        <div className="flex gap-2">
-          <Link to="/admin/categories" className="rounded-2xl border border-stone-300 px-4 py-3 text-sm font-semibold dark:border-stone-700">
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+          <Link to="/admin/categories" className="flex-1 rounded-2xl border border-stone-300 px-4 py-3 text-center text-sm font-semibold dark:border-stone-700 sm:flex-none">
             Categories
           </Link>
-          <Link to="/admin/songs/new" className="rounded-2xl bg-brand-700 px-4 py-3 text-sm font-semibold text-white">
+          <Link to="/admin/songs/new" className="flex-1 rounded-2xl bg-brand-700 px-4 py-3 text-center text-sm font-semibold text-white sm:flex-none">
             New song
           </Link>
         </div>
@@ -116,13 +116,13 @@ export function AdminDashboardPage() {
 
       <div className="flex flex-wrap items-center gap-2 rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
         <label className="text-sm font-semibold">Status</label>
-        <select value={status} onChange={(event) => setStatus(event.target.value as typeof status)} className="rounded-2xl border border-stone-300 px-4 py-3 text-sm dark:border-stone-700 dark:bg-stone-900">
+        <select value={status} onChange={(event) => setStatus(event.target.value as typeof status)} className="w-full rounded-2xl border border-stone-300 px-4 py-3 text-sm dark:border-stone-700 dark:bg-stone-900 sm:w-auto">
           <option value="">All</option>
           <option value="published">Published</option>
           <option value="draft">Draft</option>
         </select>
         <label className="ml-2 text-sm font-semibold">Folder</label>
-        <select value={categoryId ?? ''} onChange={(event) => setCategoryId(event.target.value ? Number(event.target.value) : undefined)} className="rounded-2xl border border-stone-300 px-4 py-3 text-sm dark:border-stone-700 dark:bg-stone-900">
+        <select value={categoryId ?? ''} onChange={(event) => setCategoryId(event.target.value ? Number(event.target.value) : undefined)} className="w-full rounded-2xl border border-stone-300 px-4 py-3 text-sm dark:border-stone-700 dark:bg-stone-900 sm:w-auto">
           <option value="">All folders</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
@@ -130,7 +130,7 @@ export function AdminDashboardPage() {
             </option>
           ))}
         </select>
-        <span className="ml-auto text-sm text-stone-500 dark:text-stone-400">{isLoading ? 'Refreshing...' : `${songs.length} songs shown`}</span>
+        <span className="basis-full text-sm text-stone-500 dark:text-stone-400 sm:ml-auto sm:basis-auto">{isLoading ? 'Refreshing...' : `${songs.length} songs shown`}</span>
       </div>
 
       {error ? <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}

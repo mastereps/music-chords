@@ -240,14 +240,14 @@ export function LineupPage() {
                 </label>
               </div>
 
-              <div className="flex items-center gap-2 pt-6">
+              <div className="flex w-full flex-wrap items-center gap-2 pt-0 sm:w-auto sm:pt-6">
                 <span className="rounded-full bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
                   {draftId && draftId === activeLineupId ? 'Active lineup' : 'Editor only'}
                 </span>
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="min-h-12 rounded-2xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-800"
+                  className="min-h-12 w-full rounded-2xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-800 sm:w-auto"
                 >
                   Save lineup
                 </button>
@@ -267,7 +267,7 @@ export function LineupPage() {
           </div>
 
           <div className="rounded-[2rem] border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-stone-900 dark:text-white">Lineup order</p>
                 <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">This is the only place where songs are added, removed, and reordered.</p>
@@ -343,12 +343,12 @@ export function LineupPage() {
           />
 
           <div className="rounded-[2rem] border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-stone-900 dark:text-white">Library results</p>
                 <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{isLoadingSongs ? 'Refreshing songs...' : `${songResults.length} songs ready to add`}</p>
               </div>
-              {debouncedQuery ? <span className="text-xs text-stone-500 dark:text-stone-400">Search: "{debouncedQuery}"</span> : null}
+              {debouncedQuery ? <span className="basis-full text-xs text-stone-500 dark:text-stone-400 sm:basis-auto">Search: "{debouncedQuery}"</span> : null}
             </div>
 
             {searchError ? <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{searchError}</p> : null}
@@ -380,7 +380,7 @@ export function LineupPage() {
                       </span>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-between gap-3">
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                       <div className="flex flex-wrap gap-2 text-xs text-stone-500 dark:text-stone-400">
                         {song.category ? <span className="rounded-full bg-white px-3 py-1 dark:bg-stone-900">{song.category.name}</span> : null}
                         {song.language ? <span className="rounded-full bg-white px-3 py-1 dark:bg-stone-900">{song.language}</span> : null}

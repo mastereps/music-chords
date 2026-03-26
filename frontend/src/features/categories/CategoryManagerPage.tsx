@@ -123,7 +123,7 @@ export function CategoryManagerPage() {
         </label>
         {message ? <p className="text-sm text-emerald-700 dark:text-emerald-300">{message}</p> : null}
         {error ? <p className="text-sm text-red-700 dark:text-red-300">{error}</p> : null}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button type="submit" disabled={isSaving} className="rounded-2xl bg-brand-700 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60">
             {isSaving ? 'Saving...' : editingId ? 'Save category' : 'Add category'}
           </button>
@@ -137,14 +137,14 @@ export function CategoryManagerPage() {
 
       <div className="space-y-3">
         {orderedCategories.map((category) => (
-          <div key={category.id} className="rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900" style={{ marginLeft: `${category.depth * 12}px` }}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
+          <div key={category.id} className="rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+            <div className="flex flex-wrap items-center justify-between gap-2" style={{ paddingLeft: `${category.depth * 8}px` }}>
               <div>
                 <h3 className="text-lg font-semibold">{category.name}</h3>
                 <p className="text-sm text-stone-600 dark:text-stone-300">/{category.slug}</p>
-                <p className="mt-2 text-xs text-stone-500 dark:text-stone-400">{category.songCount ?? 0} songs • {category.childCount ?? 0} child folders</p>
+                <p className="mt-2 text-xs text-stone-500 dark:text-stone-400">{category.songCount ?? 0} songs - {category.childCount ?? 0} child folders</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => {

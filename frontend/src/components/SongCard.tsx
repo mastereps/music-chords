@@ -27,7 +27,7 @@ export function SongCard({ song }: { song: SongSummary }) {
             #{tag.name}
           </span>
         ))}
-        <span className="ml-auto">Updated {formatDate(song.updatedAt)}</span>
+        <span className="basis-full text-stone-500 sm:ml-auto sm:basis-auto dark:text-stone-400">Updated {formatDate(song.updatedAt)}</span>
       </div>
     </Link>
   );

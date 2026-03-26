@@ -102,7 +102,7 @@ export function SongDetailPage() {
         </div>
 
         <div className="rounded-[2rem] border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <TransposeControls offset={offset} onDecrease={() => setOffset((value) => value - 1)} onIncrease={() => setOffset((value) => value + 1)} onReset={() => setOffset(0)} />
             <FontSizeControls fontSize={fontSize} onDecrease={() => setFontSize((value) => Math.max(13, value - 1))} onIncrease={() => setFontSize((value) => Math.min(28, value + 1))} />
           </div>
