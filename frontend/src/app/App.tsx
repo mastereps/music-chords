@@ -1,0 +1,60 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
+import { AuthProvider } from './AuthProvider';
+import { AppLayout } from '../components/AppLayout';
+import { RequireRole } from './RequireRole';
+import { CategoryManagerPage } from '../features/categories/CategoryManagerPage';
+import { AdminDashboardPage } from '../features/admin/AdminDashboardPage';
+import { SongEditorPage } from '../features/admin/SongEditorPage';
+import { LoginPage } from '../features/auth/LoginPage';
+import { SongDetailPage } from '../features/songs/SongDetailPage';
+import { SongsPage } from '../features/songs/SongsPage';
+
+export function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route index element={<SongsPage />} />
+            <Route path="songs/:slug" element={<SongDetailPage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route
+              path="admin"
+              element={
+                <RequireRole allowedRoles={['admin', 'editor']}>
+                  <AdminDashboardPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="admin/songs/new"
+              element={
+                <RequireRole allowedRoles={['admin', 'editor']}>
+                  <SongEditorPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="admin/songs/:slug/edit"
+              element={
+                <RequireRole allowedRoles={['admin', 'editor']}>
+                  <SongEditorPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="admin/categories"
+              element={
+                <RequireRole allowedRoles={['admin']}>
+                  <CategoryManagerPage />
+                </RequireRole>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}

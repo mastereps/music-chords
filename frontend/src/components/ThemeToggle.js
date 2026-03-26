@@ -1,0 +1,4 @@
+import { jsxs as _jsxs } from "react/jsx-runtime";
+export function ThemeToggle({ theme, onToggle }) {
+    return (_jsxs("button", { type: "button", onClick: onToggle, className: "rounded-full border border-stone-300 px-3 py-2 text-xs font-semibold text-stone-700 transition hover:border-brand-500 hover:text-brand-700 dark:border-stone-700 dark:text-stone-200", children: [theme === 'dark' ? 'Light' : 'Dark', " mode"] }));
+}

@@ -1,0 +1,5 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { formatDate } from '../utils/date';
+export function RevisionList({ items }) {
+    return (_jsxs("div", { className: "rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900", children: [_jsx("h3", { className: "text-base font-semibold", children: "Revision history" }), _jsx("div", { className: "mt-4 space-y-4", children: items.length ? (items.map((item) => (_jsxs("div", { className: "rounded-2xl border border-stone-200 p-3 dark:border-stone-800", children: [_jsxs("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [_jsx("p", { className: "text-sm font-semibold", children: item.editor.displayName }), _jsx("span", { className: "text-xs text-stone-500 dark:text-stone-400", children: formatDate(item.createdAt) })] }), item.revisionNote ? _jsx("p", { className: "mt-2 text-sm text-stone-600 dark:text-stone-300", children: item.revisionNote }) : null] }, item.id)))) : (_jsx("p", { className: "text-sm text-stone-500 dark:text-stone-400", children: "No revisions yet." })) })] }));
+}

@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "baseUrl": "./src",
+    "types": [
+      "vite/client"
+    ]
+  },
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "include": [
+    "src"
+  ]
+}
