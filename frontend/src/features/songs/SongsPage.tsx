@@ -91,8 +91,10 @@ export function SongsPage() {
       setTotal(0);
       setHasMore(true);
       setError(null);
-      setPage(1);
-      return;
+      if (page !== 1) {
+        setPage(1);
+        return;
+      }
     }
 
     const controller = new AbortController();
