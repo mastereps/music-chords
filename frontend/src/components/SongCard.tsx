@@ -12,7 +12,7 @@ export function SongCard({ song }: { song: SongSummary }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-lg font-semibold text-stone-900 dark:text-white">{song.title}</h3>
+          <h3 className="max-w-[210px] truncate text-lg font-semibold text-stone-900 dark:text-white">{song.title}</h3>
           <p className="mt-1 truncate text-sm text-stone-600 dark:text-stone-300">{song.artist || 'Unknown artist'}</p>
         </div>
         <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">

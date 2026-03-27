@@ -83,7 +83,7 @@ export function SongsPage() {
 
       {error ? <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
-      <div className="grid gap-3">
+      <div className="grid w-full gap-3">
         {!isLoading && songs.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-stone-300 px-4 py-10 text-center text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400">
             No songs matched your search.
