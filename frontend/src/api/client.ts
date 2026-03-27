@@ -23,6 +23,7 @@ interface SongSearchParams {
   page?: number;
   pageSize?: number;
   categoryId?: number;
+  artist?: string;
   tag?: string;
   language?: string;
   status?: 'draft' | 'published';

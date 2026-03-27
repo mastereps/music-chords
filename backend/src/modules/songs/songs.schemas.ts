@@ -24,6 +24,7 @@ export const songSearchSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(50).default(20),
   categoryId: z.coerce.number().int().positive().optional(),
+  artist: z.string().trim().optional().transform((value) => value || undefined),
   tag: z.string().trim().optional().transform((value) => value || undefined),
   language: z.string().trim().optional().transform((value) => value || undefined),
   status: z.enum(['draft', 'published']).optional()

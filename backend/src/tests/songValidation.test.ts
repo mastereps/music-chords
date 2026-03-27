@@ -57,10 +57,11 @@ describe('songSearchSchema', () => {
   });
 
   it('normalizes blank search inputs to undefined', () => {
-    const result = songSearchSchema.parse({ q: '   ', tag: '' });
+    const result = songSearchSchema.parse({ q: '   ', tag: '', artist: '  ' });
 
     expect(result.q).toBeUndefined();
     expect(result.tag).toBeUndefined();
+    expect(result.artist).toBeUndefined();
   });
 });
 

@@ -20,6 +20,7 @@ interface SongSearchFilters {
   page: number;
   pageSize: number;
   categoryId?: number;
+  artist?: string;
   tag?: string;
   language?: string;
   status?: SongStatus;
@@ -113,6 +114,11 @@ function buildSongQueryParts(filters: SongSearchFilters, canViewDrafts: boolean)
   if (filters.categoryId) {
     values.push(filters.categoryId);
     clauses.push(`s.category_id = $${values.length}`);
+  }
+
+  if (filters.artist) {
+    values.push(filters.artist);
+    clauses.push(`LOWER(COALESCE(s.artist, '')) = LOWER($${values.length})`);
   }
 
   if (filters.language) {
