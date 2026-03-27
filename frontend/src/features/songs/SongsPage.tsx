@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Category, SongSummary } from '@music-chords/shared';
 
@@ -8,15 +8,39 @@ import { SearchBar } from '../../components/SearchBar';
 import { SongCard } from '../../components/SongCard';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 
+const PAGE_SIZE = 20;
+
+function mergeSongs(existingSongs: SongSummary[], incomingSongs: SongSummary[]) {
+  const seenSongIds = new Set(existingSongs.map((song) => song.id));
+  const nextSongs = [...existingSongs];
+
+  incomingSongs.forEach((song) => {
+    if (!seenSongIds.has(song.id)) {
+      seenSongIds.add(song.id);
+      nextSongs.push(song);
+    }
+  });
+
+  return nextSongs;
+}
+
 export function SongsPage() {
   const [query, setQuery] = useState('');
   const [songs, setSongs] = useState<SongSummary[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<number | undefined>(undefined);
+  const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const isFetchingRef = useRef(true);
+  const hasMoreRef = useRef(true);
+  const filterKeyRef = useRef('');
   const debouncedQuery = useDebouncedValue(query, 250);
+  const filterKey = useMemo(() => `${debouncedQuery}::${activeCategoryId ?? 'all'}`, [debouncedQuery, activeCategoryId]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -25,30 +49,103 @@ export function SongsPage() {
   }, []);
 
   useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
+
+  useEffect(() => {
+    isFetchingRef.current = isLoadingInitial || isLoadingMore;
+  }, [isLoadingInitial, isLoadingMore]);
+
+  useEffect(() => {
+    const loadMoreTarget = loadMoreRef.current;
+
+    if (!loadMoreTarget) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting || isFetchingRef.current || !hasMoreRef.current) {
+          return;
+        }
+
+        isFetchingRef.current = true;
+        setPage((currentPage) => currentPage + 1);
+      },
+      {
+        rootMargin: '240px 0px',
+        threshold: 0.1
+      }
+    );
+
+    observer.observe(loadMoreTarget);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (filterKeyRef.current !== filterKey) {
+      filterKeyRef.current = filterKey;
+      isFetchingRef.current = true;
+      setSongs([]);
+      setTotal(0);
+      setHasMore(true);
+      setError(null);
+      setPage(1);
+      return;
+    }
+
     const controller = new AbortController();
+    const isFirstPage = page === 1;
 
     const loadSongs = async () => {
-      setIsLoading(true);
+      if (isFirstPage) {
+        setIsLoadingInitial(true);
+      } else {
+        setIsLoadingMore(true);
+      }
+
       setError(null);
+      isFetchingRef.current = true;
 
       try {
-        const result = await apiClient.getSongs({ q: debouncedQuery, categoryId: activeCategoryId, page: 1, pageSize: 20 }, controller.signal);
-        setSongs(result.items);
+        const result = await apiClient.getSongs(
+          {
+            q: debouncedQuery,
+            categoryId: activeCategoryId,
+            page,
+            pageSize: PAGE_SIZE
+          },
+          controller.signal
+        );
+
         setTotal(result.total);
+        setSongs((currentSongs) => {
+          const nextSongs = isFirstPage ? result.items : mergeSongs(currentSongs, result.items);
+          setHasMore(nextSongs.length < result.total);
+          return nextSongs;
+        });
       } catch (loadError) {
         if ((loadError as Error).name === 'AbortError') {
           return;
         }
 
+        setHasMore(false);
         setError(loadError instanceof Error ? loadError.message : 'Unable to load songs.');
       } finally {
-        setIsLoading(false);
+        if (isFirstPage) {
+          setIsLoadingInitial(false);
+        } else {
+          setIsLoadingMore(false);
+        }
+
+        isFetchingRef.current = false;
       }
     };
 
     void loadSongs();
     return () => controller.abort();
-  }, [debouncedQuery, activeCategoryId]);
+  }, [activeCategoryId, debouncedQuery, filterKey, page]);
 
   const activeCategoryName = useMemo(
     () => categories.find((category) => category.id === activeCategoryId)?.name,
@@ -77,14 +174,20 @@ export function SongsPage() {
       <CategoryPills items={categories} activeCategoryId={activeCategoryId} onSelect={setActiveCategoryId} />
 
       <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-sm text-stone-500 dark:text-stone-400">
-        <span>{isLoading ? 'Refreshing results...' : `${songs.length} visible on this page`}</span>
-        {debouncedQuery ? <span>Search: “{debouncedQuery}”</span> : <span>Use short, specific titles for faster matching.</span>}
+        <span>
+          {isLoadingInitial
+            ? 'Loading songs...'
+            : total > songs.length
+              ? `${songs.length} of ${total} songs loaded`
+              : `${songs.length} songs loaded`}
+        </span>
+        {debouncedQuery ? <span>Search: "{debouncedQuery}"</span> : <span>Use short, specific titles for faster matching.</span>}
       </div>
 
       {error ? <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
-      <div className="grid w-full gap-3">
-        {!isLoading && songs.length === 0 ? (
+      <div className="grid w-full gap-3 pb-6">
+        {!isLoadingInitial && songs.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-stone-300 px-4 py-10 text-center text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400">
             No songs matched your search.
           </div>
@@ -92,8 +195,14 @@ export function SongsPage() {
         {songs.map((song) => (
           <SongCard key={song.id} song={song} />
         ))}
+        <div
+          ref={loadMoreRef}
+          aria-hidden="true"
+          className={songs.length > 0 ? 'flex min-h-14 items-center justify-center px-2 py-2 text-sm text-stone-500 dark:text-stone-400' : 'h-px'}
+        >
+          {songs.length > 0 ? (isLoadingMore ? 'Loading more songs...' : hasMore ? 'Scroll to load more songs' : 'End of song list') : null}
+        </div>
       </div>
     </div>
   );
 }
-

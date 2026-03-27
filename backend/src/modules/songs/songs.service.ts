@@ -175,11 +175,10 @@ function listQuery(whereClause: string, rankExpression: string, limitPlaceholder
       SELECT
         s.id,
         ${rankExpression} AS search_rank,
-        s.updated_at,
         s.title
       FROM songs s
       ${whereClause}
-      ORDER BY search_rank DESC, s.updated_at DESC, s.title ASC
+      ORDER BY LOWER(s.title) ASC, s.title ASC, search_rank DESC, s.id ASC
       LIMIT $${limitPlaceholder}
       OFFSET $${offsetPlaceholder}
     )
@@ -215,7 +214,7 @@ function listQuery(whereClause: string, rankExpression: string, limitPlaceholder
     LEFT JOIN song_tags st ON st.song_id = s.id
     LEFT JOIN tags t ON t.id = st.tag_id
     GROUP BY s.id, c.id, fs.search_rank
-    ORDER BY fs.search_rank DESC, s.updated_at DESC, s.title ASC;
+    ORDER BY LOWER(s.title) ASC, s.title ASC, fs.search_rank DESC, s.id ASC;
   `;
 }
 
@@ -490,3 +489,5 @@ export async function getDashboardStats() {
     pendingSuggestions: Number(row.pending_suggestions)
   };
 }
+
+

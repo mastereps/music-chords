@@ -10,7 +10,7 @@ export function CategoryPills({
   onSelect: (categoryId?: number) => void;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="flex gap-2 overflow-x-auto pb-1 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]">
       <button
         type="button"
         onClick={() => onSelect(undefined)}
@@ -39,3 +39,4 @@ export function CategoryPills({
     </div>
   );
 }
+

@@ -7,7 +7,7 @@
 - Use React functional components and hooks
 - Use TypeScript everywhere possible
 - Use Tailwind for styling
-- Backend must use Express + MySQL with connection pooling
+- Backend must use Express + POSTGRESQL with connection pooling
 - Validate all inputs
 - Add explicit error handling and logging
 - Keep components small and reusable

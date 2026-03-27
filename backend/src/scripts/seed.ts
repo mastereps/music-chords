@@ -35,9 +35,27 @@ async function seed() {
   );
 
   await query(
+    `UPDATE categories
+     SET name = 'Praising',
+         slug = 'praising',
+         sort_order = 1,
+         updated_at = NOW()
+     WHERE slug = 'praise'
+       AND NOT EXISTS (SELECT 1 FROM categories existing WHERE existing.slug = 'praising')`
+  );
+
+  await query(
+    `UPDATE categories
+     SET name = 'Praising',
+         sort_order = 1,
+         updated_at = NOW()
+     WHERE slug = 'praising'`
+  );
+
+  await query(
     `INSERT INTO categories (name, slug, sort_order)
      VALUES
-       ('Praise', 'praise', 1),
+       ('Praising', 'praising', 1),
        ('Worship', 'worship', 2),
        ('Old Songs', 'old-songs', 3),
        ('Christmas', 'christmas', 4),
@@ -87,7 +105,7 @@ async function seed() {
       key: 'G',
       slug: 'shout-to-the-lord',
       content: `Verse 1\nG      D/F#   Em\nMy Jesus, my Savior\nC           G/D  Am7   D\nLord there is none like You\n\nChorus\nG    Em   C   D\nShout to the Lord all the earth let us sing`,
-      categorySlug: 'praise',
+      categorySlug: 'praising',
       tagSlugs: ['fast'],
       status: 'published',
       language: 'English'
