@@ -291,7 +291,7 @@ export function LineupPage() {
                       {index + 1}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <Link to={`/songs/${song.slug}`} className="block truncate text-base font-semibold text-stone-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-200">
+                      <Link to={`/songs/${song.slug}`} className="block max-w-[190px] truncate text-base font-semibold text-stone-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-200">
                         {song.title}
                       </Link>
                       <p className="mt-1 truncate text-sm text-stone-600 dark:text-stone-300">{song.artist || 'Unknown artist'}</p>
@@ -370,7 +370,7 @@ export function LineupPage() {
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <Link to={`/songs/${song.slug}`} className="block truncate text-base font-semibold text-stone-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-200">
+                        <Link to={`/songs/${song.slug}`} className="block max-w-[190px] truncate text-base font-semibold text-stone-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-200">
                           {song.title}
                         </Link>
                         <p className="mt-1 truncate text-sm text-stone-600 dark:text-stone-300">{song.artist || 'Unknown artist'}</p>
