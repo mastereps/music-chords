@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import type { SongSummary } from '@music-chords/shared';
 
-import { apiClient } from '../../api/client';
 import { SearchBar } from '../../components/SearchBar';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import { usePaginatedSongs } from '../../hooks/usePaginatedSongs';
 import { formatDate } from '../../utils/date';
 import { useLineups } from './LineupProvider';
 import type { Lineup, LineupSong } from './lineupTypes';
@@ -44,12 +44,19 @@ export function LineupPage() {
   const [draftName, setDraftName] = useState(initialDraft.name);
   const [draftSongs, setDraftSongs] = useState<LineupSong[]>(initialDraft.songs);
   const [query, setQuery] = useState('');
-  const [songResults, setSongResults] = useState<SongSummary[]>([]);
-  const [isLoadingSongs, setIsLoadingSongs] = useState(true);
-  const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchRefreshKey, setSearchRefreshKey] = useState(0);
   const [editorError, setEditorError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
   const debouncedQuery = useDebouncedValue(query, 250);
+  const {
+    songs: songResults,
+    total: songResultsTotal,
+    hasMore,
+    isLoadingInitial: isLoadingSongs,
+    isLoadingMore,
+    error: searchError,
+    loadMoreRef
+  } = usePaginatedSongs({ q: debouncedQuery, refreshKey: searchRefreshKey });
 
   useEffect(() => {
     if (!draftId) {
@@ -68,32 +75,8 @@ export function LineupPage() {
     setDraftSongs(fallbackDraft.songs);
   }, [activeLineupId, draftId, lineups]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadSongs = async () => {
-      setIsLoadingSongs(true);
-      setSearchError(null);
-
-      try {
-        const result = await apiClient.getSongs({ q: debouncedQuery, page: 1, pageSize: 12 }, controller.signal);
-        setSongResults(result.items);
-      } catch (error) {
-        if ((error as Error).name === 'AbortError') {
-          return;
-        }
-
-        setSearchError(error instanceof Error ? error.message : 'Unable to search the song library.');
-      } finally {
-        setIsLoadingSongs(false);
-      }
-    };
-
-    void loadSongs();
-    return () => controller.abort();
-  }, [debouncedQuery]);
-
   const selectedLineup = draftId ? lineups.find((lineup) => lineup.id === draftId) ?? null : null;
+  const draftSongIds = useMemo(() => new Set(draftSongs.map((song) => song.id)), [draftSongs]);
   const hasUnsavedChanges =
     draftId === null
       ? draftName.trim().length > 0 || draftSongs.length > 0
@@ -121,7 +104,7 @@ export function LineupPage() {
   };
 
   const handleAddSong = (song: SongSummary) => {
-    if (draftSongs.some((lineupSong) => lineupSong.id === song.id)) {
+    if (draftSongIds.has(song.id)) {
       return;
     }
 
@@ -133,6 +116,11 @@ export function LineupPage() {
   const handleRemoveSong = (songId: number) => {
     setDraftSongs((currentSongs) => currentSongs.filter((song) => song.id !== songId));
     setSaveNotice(null);
+  };
+
+  const handleResetSearch = () => {
+    setQuery('');
+    setSearchRefreshKey((currentKey) => currentKey + 1);
   };
 
   const moveSong = (index: number, direction: -1 | 1) => {
@@ -336,7 +324,7 @@ export function LineupPage() {
           <SearchBar
             value={query}
             onChange={setQuery}
-            onClear={() => setQuery('')}
+            onClear={handleResetSearch}
             sticky={false}
             label="Search song library"
             placeholder="Find songs to add to this lineup"
@@ -346,7 +334,13 @@ export function LineupPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-stone-900 dark:text-white">Library results</p>
-                <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{isLoadingSongs ? 'Refreshing songs...' : `${songResults.length} songs ready to add`}</p>
+                <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+                  {isLoadingSongs
+                    ? 'Refreshing songs...'
+                    : songResultsTotal > songResults.length
+                      ? `${songResults.length} of ${songResultsTotal} songs ready to add`
+                      : `${songResults.length} songs ready to add`}
+                </p>
               </div>
               {debouncedQuery ? <span className="basis-full text-xs text-stone-500 dark:text-stone-400 sm:basis-auto">Search: "{debouncedQuery}"</span> : null}
             </div>
@@ -356,12 +350,12 @@ export function LineupPage() {
             <div className="mt-4 space-y-3">
               {!isLoadingSongs && songResults.length === 0 ? (
                 <div className="rounded-[1.5rem] border border-dashed border-stone-300 px-4 py-8 text-center text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400">
-                  No songs matched that search.
+                  {debouncedQuery ? 'No songs matched that search.' : 'No songs are available in the library.'}
                 </div>
               ) : null}
 
               {songResults.map((song) => {
-                const isAdded = draftSongs.some((lineupSong) => lineupSong.id === song.id);
+                const isAdded = draftSongIds.has(song.id);
 
                 return (
                   <div
@@ -397,6 +391,20 @@ export function LineupPage() {
                   </div>
                 );
               })}
+
+              <div
+                ref={loadMoreRef}
+                aria-hidden="true"
+                className={songResults.length > 0 ? 'flex min-h-14 items-center justify-center px-2 py-2 text-sm text-stone-500 dark:text-stone-400' : 'h-px'}
+              >
+                {songResults.length > 0
+                  ? isLoadingMore
+                    ? 'Loading more songs...'
+                    : hasMore
+                      ? 'Scroll to load more songs'
+                      : 'End of song library'
+                  : null}
+              </div>
             </div>
           </div>
         </aside>

@@ -1,11 +1,12 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { apiClient } from '../../api/client';
 import { ArtistFilterSelect } from '../../components/ArtistFilterSelect';
 import { CategoryPills } from '../../components/CategoryPills';
 import { SearchBar } from '../../components/SearchBar';
 import { SongCard } from '../../components/SongCard';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import { usePaginatedSongs } from '../../hooks/usePaginatedSongs';
 const PAGE_SIZE = 20;
 const ARTIST_OPTIONS = [
     'Ron Kenoly',
@@ -17,123 +18,23 @@ const ARTIST_OPTIONS = [
     'Hosanna Music',
     'Bethel Music'
 ];
-function mergeSongs(existingSongs, incomingSongs) {
-    const seenSongIds = new Set(existingSongs.map((song) => song.id));
-    const nextSongs = [...existingSongs];
-    incomingSongs.forEach((song) => {
-        if (!seenSongIds.has(song.id)) {
-            seenSongIds.add(song.id);
-            nextSongs.push(song);
-        }
-    });
-    return nextSongs;
-}
 export function SongsPage() {
     const [query, setQuery] = useState('');
-    const [songs, setSongs] = useState([]);
     const [categories, setCategories] = useState([]);
     const [activeCategoryId, setActiveCategoryId] = useState(undefined);
     const [selectedArtist, setSelectedArtist] = useState('');
-    const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
-    const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [error, setError] = useState(null);
-    const loadMoreRef = useRef(null);
-    const isFetchingRef = useRef(true);
-    const hasMoreRef = useRef(true);
-    const filterKeyRef = useRef('');
     const debouncedQuery = useDebouncedValue(query, 250);
-    const filterKey = useMemo(() => `${debouncedQuery}::${activeCategoryId ?? 'all'}::${selectedArtist ? selectedArtist.toLowerCase() : 'all'}`, [debouncedQuery, activeCategoryId, selectedArtist]);
+    const { songs, total, hasMore, isLoadingInitial, isLoadingMore, error, loadMoreRef } = usePaginatedSongs({
+        q: debouncedQuery,
+        categoryId: activeCategoryId,
+        artist: selectedArtist || undefined,
+        pageSize: PAGE_SIZE
+    });
     useEffect(() => {
         const controller = new AbortController();
         void apiClient.getCategories(controller.signal).then(setCategories).catch(() => setCategories([]));
         return () => controller.abort();
     }, []);
-    useEffect(() => {
-        hasMoreRef.current = hasMore;
-    }, [hasMore]);
-    useEffect(() => {
-        isFetchingRef.current = isLoadingInitial || isLoadingMore;
-    }, [isLoadingInitial, isLoadingMore]);
-    useEffect(() => {
-        const loadMoreTarget = loadMoreRef.current;
-        if (!loadMoreTarget) {
-            return;
-        }
-        const observer = new IntersectionObserver(([entry]) => {
-            if (!entry?.isIntersecting || isFetchingRef.current || !hasMoreRef.current) {
-                return;
-            }
-            isFetchingRef.current = true;
-            setPage((currentPage) => currentPage + 1);
-        }, {
-            rootMargin: '240px 0px',
-            threshold: 0.1
-        });
-        observer.observe(loadMoreTarget);
-        return () => observer.disconnect();
-    }, []);
-    useEffect(() => {
-        if (filterKeyRef.current !== filterKey) {
-            filterKeyRef.current = filterKey;
-            isFetchingRef.current = true;
-            setSongs([]);
-            setTotal(0);
-            setHasMore(true);
-            setError(null);
-            if (page !== 1) {
-                setPage(1);
-                return;
-            }
-        }
-        const controller = new AbortController();
-        const isFirstPage = page === 1;
-        const loadSongs = async () => {
-            if (isFirstPage) {
-                setIsLoadingInitial(true);
-            }
-            else {
-                setIsLoadingMore(true);
-            }
-            setError(null);
-            isFetchingRef.current = true;
-            try {
-                const result = await apiClient.getSongs({
-                    q: debouncedQuery,
-                    categoryId: activeCategoryId,
-                    artist: selectedArtist || undefined,
-                    page,
-                    pageSize: PAGE_SIZE
-                }, controller.signal);
-                setTotal(result.total);
-                setSongs((currentSongs) => {
-                    const nextSongs = isFirstPage ? result.items : mergeSongs(currentSongs, result.items);
-                    setHasMore(nextSongs.length < result.total);
-                    return nextSongs;
-                });
-            }
-            catch (loadError) {
-                if (loadError.name === 'AbortError') {
-                    return;
-                }
-                setHasMore(false);
-                setError(loadError instanceof Error ? loadError.message : 'Unable to load songs.');
-            }
-            finally {
-                if (isFirstPage) {
-                    setIsLoadingInitial(false);
-                }
-                else {
-                    setIsLoadingMore(false);
-                }
-                isFetchingRef.current = false;
-            }
-        };
-        void loadSongs();
-        return () => controller.abort();
-    }, [activeCategoryId, debouncedQuery, filterKey, page, selectedArtist]);
     const activeCategoryName = useMemo(() => categories.find((category) => category.id === activeCategoryId)?.name, [categories, activeCategoryId]);
     const activeResultsLabel = useMemo(() => {
         const activeFilters = [activeCategoryName, selectedArtist].filter(Boolean);
