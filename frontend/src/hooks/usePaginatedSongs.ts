@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type { SongSummary } from '@music-chords/shared';
+import type { SongStatus, SongSummary } from '@music-chords/shared';
 
 import { apiClient } from '../api/client';
 
@@ -24,12 +24,14 @@ export function usePaginatedSongs({
   q,
   categoryId,
   artist,
+  status,
   pageSize = DEFAULT_PAGE_SIZE,
   refreshKey = 0
 }: {
   q?: string;
   categoryId?: number;
   artist?: string;
+  status?: SongStatus;
   pageSize?: number;
   refreshKey?: number;
 }) {
@@ -45,8 +47,8 @@ export function usePaginatedSongs({
   const hasMoreRef = useRef(true);
   const filterKeyRef = useRef('');
   const filterKey = useMemo(
-    () => `${q ?? ''}::${categoryId ?? 'all'}::${artist ? artist.toLowerCase() : 'all'}::${refreshKey}`,
-    [artist, categoryId, q, refreshKey]
+    () => `${q ?? ''}::${categoryId ?? 'all'}::${artist ? artist.toLowerCase() : 'all'}::${status ?? 'all'}::${refreshKey}`,
+    [artist, categoryId, q, refreshKey, status]
   );
 
   useEffect(() => {
@@ -117,6 +119,7 @@ export function usePaginatedSongs({
             q,
             categoryId,
             artist,
+            status,
             page,
             pageSize
           },
@@ -149,7 +152,7 @@ export function usePaginatedSongs({
 
     void loadSongs();
     return () => controller.abort();
-  }, [artist, categoryId, filterKey, page, pageSize, q]);
+  }, [artist, categoryId, filterKey, page, pageSize, q, status]);
 
   return {
     songs,

@@ -80,3 +80,30 @@ export interface SuggestionInput {
   message: string;
   proposedContent: string;
 }
+
+export interface LineupSong {
+  id: number;
+  slug: string;
+  title: string;
+  artist: string | null;
+  key: string;
+}
+
+export interface LineupSummary {
+  id: number;
+  title: string;
+  description: string | null;
+  songCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LineupDetail extends LineupSummary {
+  songs: LineupSong[];
+}
+
+export interface LineupInput {
+  title: string;
+  description?: string | null;
+  songIds: number[];
+}

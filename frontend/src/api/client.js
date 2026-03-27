@@ -104,6 +104,31 @@ export const apiClient = {
             body: JSON.stringify(input)
         });
     },
+    async getLineups(signal) {
+        const data = await request('/api/lineups', { signal });
+        return data.items;
+    },
+    async getLineup(id, signal) {
+        const data = await request(`/api/lineups/${id}`, { signal });
+        return data.item;
+    },
+    async createLineup(input) {
+        const data = await request('/api/lineups', {
+            method: 'POST',
+            body: JSON.stringify(input)
+        });
+        return data.item;
+    },
+    async updateLineup(id, input) {
+        const data = await request(`/api/lineups/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(input)
+        });
+        return data.item;
+    },
+    async deleteLineup(id) {
+        await request(`/api/lineups/${id}`, { method: 'DELETE' });
+    },
     async getCategories(signal) {
         const data = await request('/api/categories', { signal });
         return data.items;

@@ -80,6 +80,25 @@ CREATE TABLE IF NOT EXISTS correction_suggestions (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS lineups (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  updated_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS lineup_songs (
+  lineup_id INTEGER NOT NULL REFERENCES lineups(id) ON DELETE CASCADE,
+  song_id INTEGER NOT NULL REFERENCES songs(id) ON DELETE CASCADE,
+  position INTEGER NOT NULL CHECK (position > 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (lineup_id, position),
+  UNIQUE (lineup_id, song_id)
+);
+
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -100,6 +119,8 @@ DROP TRIGGER IF EXISTS songs_set_updated_at ON songs;
 CREATE TRIGGER songs_set_updated_at BEFORE UPDATE ON songs FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 DROP TRIGGER IF EXISTS correction_suggestions_set_updated_at ON correction_suggestions;
 CREATE TRIGGER correction_suggestions_set_updated_at BEFORE UPDATE ON correction_suggestions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+DROP TRIGGER IF EXISTS lineups_set_updated_at ON lineups;
+CREATE TRIGGER lineups_set_updated_at BEFORE UPDATE ON lineups FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE INDEX IF NOT EXISTS idx_users_role_id ON users(role_id);
 CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id);
@@ -110,6 +131,9 @@ CREATE INDEX IF NOT EXISTS idx_songs_updated_at ON songs(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_song_revisions_song_id ON song_revisions(song_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_correction_suggestions_song_id ON correction_suggestions(song_id);
 CREATE INDEX IF NOT EXISTS idx_correction_suggestions_status ON correction_suggestions(status);
+CREATE INDEX IF NOT EXISTS idx_lineup_songs_song_id ON lineup_songs(song_id);
+CREATE INDEX IF NOT EXISTS idx_lineup_songs_lineup_id_position ON lineup_songs(lineup_id, position);
+CREATE INDEX IF NOT EXISTS idx_lineups_updated_at ON lineups(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_songs_title_trgm ON songs USING GIN (title gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_songs_artist_trgm ON songs USING GIN (artist gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_songs_content_trgm ON songs USING GIN (content gin_trgm_ops);

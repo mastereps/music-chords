@@ -1,26 +1,4 @@
-import type { SongSummary } from '@music-chords/shared';
-
-export interface LineupSong {
-  id: number;
-  slug: string;
-  title: string;
-  artist: string | null;
-  key: string;
-}
-
-export interface Lineup {
-  id: string;
-  name: string;
-  songs: LineupSong[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface LineupInput {
-  id?: string | null;
-  name: string;
-  songs: LineupSong[];
-}
+import type { LineupDetail, LineupInput, LineupSong, LineupSummary, SongSummary } from '@music-chords/shared';
 
 export function toLineupSong(song: SongSummary): LineupSong {
   return {
@@ -31,3 +9,5 @@ export function toLineupSong(song: SongSummary): LineupSong {
     key: song.key
   };
 }
+
+export type { LineupDetail, LineupInput, LineupSong, LineupSummary };

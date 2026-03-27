@@ -8,6 +8,13 @@ import {
   updateCategory
 } from '../modules/categories/categories.controller.js';
 import {
+  createLineup,
+  deleteLineup,
+  getLineup,
+  getLineups,
+  updateLineup
+} from '../modules/lineups/lineups.controller.js';
+import {
   createSong,
   deleteSong,
   getAdminDashboard,
@@ -33,6 +40,12 @@ apiRouter.put('/songs/:id', requireAuth, requireRole('admin', 'editor'), updateS
 apiRouter.delete('/songs/:id', requireAuth, requireRole('admin'), deleteSong);
 apiRouter.post('/songs/:id/suggestions', suggestSongCorrection);
 apiRouter.get('/songs/:id/revisions', requireAuth, requireRole('admin', 'editor'), listRevisions);
+
+apiRouter.get('/lineups', getLineups);
+apiRouter.get('/lineups/:id', getLineup);
+apiRouter.post('/lineups', requireAuth, requireRole('admin', 'editor'), createLineup);
+apiRouter.put('/lineups/:id', requireAuth, requireRole('admin', 'editor'), updateLineup);
+apiRouter.delete('/lineups/:id', requireAuth, requireRole('admin', 'editor'), deleteLineup);
 
 apiRouter.get('/categories', getCategories);
 apiRouter.post('/categories', requireAuth, requireRole('admin'), createCategory);

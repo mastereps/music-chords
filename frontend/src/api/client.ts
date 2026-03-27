@@ -1,13 +1,16 @@
 import type {
   AuthUser,
   Category,
+  LineupDetail,
+  LineupInput,
+  LineupSummary,
   PaginatedResponse,
   SongDetail,
   SongInput,
   SongRevision,
   SongSummary,
-  Tag,
-  SuggestionInput
+  SuggestionInput,
+  Tag
 } from '@music-chords/shared';
 
 export interface DashboardStats {
@@ -155,6 +158,33 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify(input)
     });
+  },
+  async getLineups(signal?: AbortSignal) {
+    const data = await request<{ items: LineupSummary[] }>('/api/lineups', { signal });
+    return data.items;
+  },
+  async getLineup(id: number, signal?: AbortSignal) {
+    const data = await request<{ item: LineupDetail }>(`/api/lineups/${id}`, { signal });
+    return data.item;
+  },
+  async createLineup(input: LineupInput) {
+    const data = await request<{ item: LineupDetail }>('/api/lineups', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+
+    return data.item;
+  },
+  async updateLineup(id: number, input: LineupInput) {
+    const data = await request<{ item: LineupDetail }>(`/api/lineups/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(input)
+    });
+
+    return data.item;
+  },
+  async deleteLineup(id: number) {
+    await request(`/api/lineups/${id}`, { method: 'DELETE' });
   },
   async getCategories(signal?: AbortSignal) {
     const data = await request<{ items: Category[] }>('/api/categories', { signal });

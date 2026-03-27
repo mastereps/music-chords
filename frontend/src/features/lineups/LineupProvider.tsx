@@ -1,98 +1,169 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
-import type { Lineup, LineupInput } from './lineupTypes';
-import {
-  createLineupId,
-  lineupStorageKeys,
-  loadStoredActiveLineupId,
-  loadStoredLineups,
-  saveStoredActiveLineupId,
-  saveStoredLineups
-} from './lineupStorage';
+import type { LineupDetail, LineupInput, LineupSummary } from '@music-chords/shared';
+
+import { apiClient } from '../../api/client';
+import { useAuth } from '../../app/AuthProvider';
 
 interface LineupContextValue {
-  lineups: Lineup[];
-  activeLineupId: string | null;
-  activeLineup: Lineup | null;
-  saveLineup: (input: LineupInput) => Lineup;
-  setActiveLineupId: (lineupId: string | null) => void;
+  lineups: LineupSummary[];
+  activeLineupId: number | null;
+  activeLineup: LineupDetail | null;
+  isLoading: boolean;
+  error: string | null;
+  canManageLineups: boolean;
+  refreshLineups: () => Promise<void>;
+  openLineup: (lineupId: number) => Promise<LineupDetail>;
+  clearActiveLineup: () => void;
+  createLineup: (input: LineupInput) => Promise<LineupDetail>;
+  updateLineup: (lineupId: number, input: LineupInput) => Promise<LineupDetail>;
+  deleteLineup: (lineupId: number) => Promise<void>;
 }
 
 const LineupContext = createContext<LineupContextValue | null>(null);
 
-export function LineupProvider({ children }: { children: React.ReactNode }) {
-  const [lineups, setLineups] = useState<Lineup[]>(() => loadStoredLineups());
-  const [activeLineupId, setActiveLineupIdState] = useState<string | null>(() => loadStoredActiveLineupId());
+function sortLineups(items: LineupSummary[]) {
+  return [...items].sort((left, right) => {
+    const timeDiff = new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime();
 
-  useEffect(() => {
-    saveStoredLineups(lineups);
-  }, [lineups]);
-
-  useEffect(() => {
-    if (activeLineupId && !lineups.some((lineup) => lineup.id === activeLineupId)) {
-      setActiveLineupIdState(lineups[0]?.id ?? null);
+    if (timeDiff !== 0) {
+      return timeDiff;
     }
-  }, [activeLineupId, lineups]);
 
-  useEffect(() => {
-    saveStoredActiveLineupId(activeLineupId);
-  }, [activeLineupId]);
+    return right.id - left.id;
+  });
+}
 
-  useEffect(() => {
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === lineupStorageKeys.lineups) {
-        setLineups(loadStoredLineups());
-      }
-
-      if (event.key === lineupStorageKeys.activeLineupId) {
-        setActiveLineupIdState(loadStoredActiveLineupId());
-      }
-    };
-
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
-  }, []);
-
-  const activeLineup = lineups.find((lineup) => lineup.id === activeLineupId) ?? null;
-
-  const setActiveLineupId = (lineupId: string | null) => {
-    setActiveLineupIdState(lineupId);
+function toLineupSummary(lineup: LineupDetail): LineupSummary {
+  return {
+    id: lineup.id,
+    title: lineup.title,
+    description: lineup.description,
+    songCount: lineup.songCount,
+    createdAt: lineup.createdAt,
+    updatedAt: lineup.updatedAt
   };
+}
 
-  const saveLineup = (input: LineupInput) => {
-    const name = input.name.trim();
+export function LineupProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  const [lineups, setLineups] = useState<LineupSummary[]>([]);
+  const [activeLineupId, setActiveLineupId] = useState<number | null>(null);
+  const [activeLineup, setActiveLineup] = useState<LineupDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const canManageLineups = user?.role === 'admin' || user?.role === 'editor';
 
-    if (!name) {
-      throw new Error('Lineup name is required.');
-    }
-
-    const timestamp = new Date().toISOString();
-    const lineupId = input.id ?? createLineupId();
-    const savedLineup: Lineup = {
-      id: lineupId,
-      name,
-      songs: input.songs,
-      createdAt: lineups.find((lineup) => lineup.id === lineupId)?.createdAt ?? timestamp,
-      updatedAt: timestamp
-    };
+  const upsertLineupSummary = (lineup: LineupDetail) => {
+    const nextSummary = toLineupSummary(lineup);
 
     setLineups((currentLineups) => {
-      const existingIndex = currentLineups.findIndex((lineup) => lineup.id === lineupId);
+      const existing = currentLineups.some((item) => item.id === lineup.id);
+      const nextLineups = existing
+        ? currentLineups.map((item) => (item.id === lineup.id ? nextSummary : item))
+        : [nextSummary, ...currentLineups];
 
-      if (existingIndex === -1) {
-        return [savedLineup, ...currentLineups];
-      }
-
-      return currentLineups.map((lineup) => (lineup.id === lineupId ? savedLineup : lineup));
+      return sortLineups(nextLineups);
     });
+  };
 
-    setActiveLineupIdState(lineupId);
+  const clearActiveLineup = () => {
+    setActiveLineupId(null);
+    setActiveLineup(null);
+  };
 
-    return savedLineup;
+  const refreshLineups = async () => {
+    setIsLoading(true);
+
+    try {
+      const items = await apiClient.getLineups();
+      setLineups(items);
+      setError(null);
+
+      if (activeLineupId && !items.some((lineup) => lineup.id === activeLineupId)) {
+        clearActiveLineup();
+      } else if (activeLineup) {
+        const matchingSummary = items.find((lineup) => lineup.id === activeLineup.id);
+
+        if (matchingSummary) {
+          setActiveLineup((currentLineup) =>
+            currentLineup && currentLineup.id === matchingSummary.id
+              ? {
+                  ...currentLineup,
+                  title: matchingSummary.title,
+                  description: matchingSummary.description,
+                  songCount: matchingSummary.songCount,
+                  createdAt: matchingSummary.createdAt,
+                  updatedAt: matchingSummary.updatedAt
+                }
+              : currentLineup
+          );
+        }
+      }
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'Unable to load lineups.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void refreshLineups();
+  }, []);
+
+  const openLineup = async (lineupId: number) => {
+    const lineup = await apiClient.getLineup(lineupId);
+    upsertLineupSummary(lineup);
+    setActiveLineupId(lineup.id);
+    setActiveLineup(lineup);
+    setError(null);
+    return lineup;
+  };
+
+  const createLineup = async (input: LineupInput) => {
+    const lineup = await apiClient.createLineup(input);
+    upsertLineupSummary(lineup);
+    setActiveLineupId(lineup.id);
+    setActiveLineup(lineup);
+    setError(null);
+    return lineup;
+  };
+
+  const updateLineup = async (lineupId: number, input: LineupInput) => {
+    const lineup = await apiClient.updateLineup(lineupId, input);
+    upsertLineupSummary(lineup);
+    setActiveLineupId(lineup.id);
+    setActiveLineup(lineup);
+    setError(null);
+    return lineup;
+  };
+
+  const deleteLineup = async (lineupId: number) => {
+    await apiClient.deleteLineup(lineupId);
+    setLineups((currentLineups) => currentLineups.filter((lineup) => lineup.id !== lineupId));
+
+    if (activeLineupId === lineupId) {
+      clearActiveLineup();
+    }
   };
 
   return (
-    <LineupContext.Provider value={{ lineups, activeLineupId, activeLineup, saveLineup, setActiveLineupId }}>
+    <LineupContext.Provider
+      value={{
+        lineups,
+        activeLineupId,
+        activeLineup,
+        isLoading,
+        error,
+        canManageLineups,
+        refreshLineups,
+        openLineup,
+        clearActiveLineup,
+        createLineup,
+        updateLineup,
+        deleteLineup
+      }}
+    >
       {children}
     </LineupContext.Provider>
   );

@@ -12,7 +12,7 @@ function mergeSongs(existingSongs, incomingSongs) {
     });
     return nextSongs;
 }
-export function usePaginatedSongs({ q, categoryId, artist, pageSize = DEFAULT_PAGE_SIZE, refreshKey = 0 }) {
+export function usePaginatedSongs({ q, categoryId, artist, status, pageSize = DEFAULT_PAGE_SIZE, refreshKey = 0 }) {
     const [songs, setSongs] = useState([]);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
@@ -24,7 +24,7 @@ export function usePaginatedSongs({ q, categoryId, artist, pageSize = DEFAULT_PA
     const isFetchingRef = useRef(true);
     const hasMoreRef = useRef(true);
     const filterKeyRef = useRef('');
-    const filterKey = useMemo(() => `${q ?? ''}::${categoryId ?? 'all'}::${artist ? artist.toLowerCase() : 'all'}::${refreshKey}`, [artist, categoryId, q, refreshKey]);
+    const filterKey = useMemo(() => `${q ?? ''}::${categoryId ?? 'all'}::${artist ? artist.toLowerCase() : 'all'}::${status ?? 'all'}::${refreshKey}`, [artist, categoryId, q, refreshKey, status]);
     useEffect(() => {
         hasMoreRef.current = hasMore;
     }, [hasMore]);
@@ -78,6 +78,7 @@ export function usePaginatedSongs({ q, categoryId, artist, pageSize = DEFAULT_PA
                     q,
                     categoryId,
                     artist,
+                    status,
                     page,
                     pageSize
                 }, controller.signal);
@@ -107,7 +108,7 @@ export function usePaginatedSongs({ q, categoryId, artist, pageSize = DEFAULT_PA
         };
         void loadSongs();
         return () => controller.abort();
-    }, [artist, categoryId, filterKey, page, pageSize, q]);
+    }, [artist, categoryId, filterKey, page, pageSize, q, status]);
     return {
         songs,
         total,

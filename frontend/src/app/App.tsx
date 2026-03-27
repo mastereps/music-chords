@@ -7,6 +7,7 @@ import { CategoryManagerPage } from '../features/categories/CategoryManagerPage'
 import { AdminDashboardPage } from '../features/admin/AdminDashboardPage';
 import { LineupProvider } from '../features/lineups/LineupProvider';
 import { LineupPage } from '../features/lineups/LineupPage';
+import { LineupsPage } from '../features/lineups/LineupsPage';
 import { SongEditorPage } from '../features/admin/SongEditorPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { SongDetailPage } from '../features/songs/SongDetailPage';
@@ -21,7 +22,16 @@ export function App() {
             <Route element={<AppLayout />}>
               <Route index element={<SongsPage />} />
               <Route path="songs/:slug" element={<SongDetailPage />} />
-              <Route path="lineups" element={<LineupPage />} />
+              <Route path="lineups" element={<LineupsPage />} />
+              <Route path="lineups/:id" element={<LineupPage />} />
+              <Route
+                path="lineups/new"
+                element={
+                  <RequireRole allowedRoles={['admin', 'editor']}>
+                    <LineupPage mode="create" />
+                  </RequireRole>
+                }
+              />
               <Route path="login" element={<LoginPage />} />
               <Route
                 path="admin"
