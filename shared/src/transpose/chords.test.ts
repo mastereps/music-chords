@@ -72,6 +72,13 @@ describe('transposeContent', () => {
     expect(output).toBe('Chorus\nPre-Chorus:\nD   A   Bm   G\n');
   });
 
+  it('transposes compact chord runs followed by repeat markers', () => {
+    const input = 'Ending\nB-D#m-F#-C# (2x)\nG#m-D#m-F#-C#\n';
+    const output = transposeContent(input, -1);
+
+    expect(output).toBe('Ending\nBb-Dm-F-C (2x)\nGm-Dm-F-C\n');
+  });
+
   it('transposes hyphen-joined chord runs inside chord lines', () => {
     const input = 'G C-G D G\nG D G C G-D-G\n';
     const output = transposeContent(input, 1);

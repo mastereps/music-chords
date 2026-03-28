@@ -28,6 +28,7 @@ const NOTE_INDEX: Record<string, number> = {
 const WRAPPER_PATTERN = /^([([{]*)(.*?)([)\]},.;:]*)$/;
 const CHORD_PATTERN = /^([A-G](?:#|b)?)([^/\s]*?)(?:\/([A-G](?:#|b)?))?$/;
 const CHORD_QUALITY_PATTERN = /^(?:(?:maj|min|dim|aug|sus|add|omit|no|m|M|\+|-)|[0-9]|[#b])*$/;
+const REPEAT_MARKER_PATTERN = /^(?:\d+x|x\d+)$/i;
 
 function parseChordCore(token: string) {
   const chordMatch = token.match(CHORD_PATTERN);
@@ -95,6 +96,16 @@ function isChordToken(token: string): boolean {
   return Boolean(parseChordCore(wrapperMatch[2]) ?? transposeChordSequence(wrapperMatch[2], 0));
 }
 
+function isChordAnnotationToken(token: string): boolean {
+  const wrapperMatch = token.match(WRAPPER_PATTERN);
+
+  if (!wrapperMatch) {
+    return false;
+  }
+
+  return REPEAT_MARKER_PATTERN.test(wrapperMatch[2]);
+}
+
 function shouldTransposeLine(line: string): boolean {
   const tokens = line.trim().split(/\s+/).filter(Boolean);
 
@@ -103,12 +114,17 @@ function shouldTransposeLine(line: string): boolean {
   }
 
   const chordCount = tokens.filter(isChordToken).length;
+  const annotationCount = tokens.filter(isChordAnnotationToken).length;
 
   if (!chordCount) {
     return false;
   }
 
-  return chordCount === tokens.length || (chordCount >= 2 && chordCount / tokens.length >= 0.5);
+  if (chordCount + annotationCount === tokens.length) {
+    return true;
+  }
+
+  return chordCount >= 2 && chordCount / tokens.length >= 0.5;
 }
 
 export function transposeRoot(root: string, steps: number): string {
