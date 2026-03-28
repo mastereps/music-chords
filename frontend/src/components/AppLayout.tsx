@@ -21,9 +21,9 @@ export function AppLayout() {
       <header className="sticky top-0 z-30 border-b border-stone-200/80 bg-stone-50/95 backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <Link to="/" className="flex min-w-0 items-center justify-center gap-3 sm:justify-start">
-            <img src="/images/music-charts-logo.png" alt="Music Charts logo" className="h-10 w-10 shrink-0 object-contain" />
+            <span className="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-brand-700/20 dark:ring-brand-300/20"><img src="/images/maranatha_music_logo.png" alt="Maranatha Music logo" className="h-full w-full object-cover" /></span>
             <p className="truncate text-[11px] uppercase tracking-[0.22em] text-brand-600 dark:text-brand-300 sm:text-xs sm:tracking-[0.3em]">
-              Music Chords
+              M-chords
             </p>
           </Link>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
@@ -73,3 +73,5 @@ export function AppLayout() {
     </div>
   );
 }
+
+
