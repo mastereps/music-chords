@@ -4,14 +4,16 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import { env } from './config/env.js';
-import { logger } from './config/logger.js';
-import { attachAuth } from './middleware/auth.js';
-import { errorHandler } from './middleware/errorHandler.js';
-import { apiRouter } from './routes/index.js';
+import { env } from './config/env';
+import { logger } from './config/logger';
+import { attachAuth } from './middleware/auth';
+import { errorHandler } from './middleware/errorHandler';
+import { apiRouter } from './routes/index';
 
 export function createApp() {
   const app = express();
+
+  app.disable('etag');
 
   app.use(
     cors({
@@ -30,6 +32,10 @@ export function createApp() {
     })
   );
   app.use(attachAuth);
+  app.use((_req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
 
   app.get('/api/health', (_req, res) => {
     res.status(200).json({ status: 'ok' });

@@ -3,11 +3,11 @@ import type { SignOptions } from 'jsonwebtoken';
 
 import type { AuthUser, RoleName } from '@music-chords/shared';
 
-import { query } from '../../config/db.js';
-import { env, isProduction } from '../../config/env.js';
-import { AppError } from '../../utils/http.js';
-import { comparePassword } from '../../utils/security.js';
-import { AUTH_COOKIE_NAME } from '../../middleware/auth.js';
+import { query } from '../../config/db';
+import { env, isProduction } from '../../config/env';
+import { AppError } from '../../utils/http';
+import { comparePassword } from '../../utils/security';
+import { AUTH_COOKIE_NAME } from '../../middleware/auth';
 
 interface UserRow {
   id: number;

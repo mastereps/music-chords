@@ -25,6 +25,7 @@ export function usePaginatedSongs({
   categoryId,
   artist,
   status,
+  prioritizePinned = false,
   pageSize = DEFAULT_PAGE_SIZE,
   refreshKey = 0
 }: {
@@ -32,6 +33,7 @@ export function usePaginatedSongs({
   categoryId?: number;
   artist?: string;
   status?: SongStatus;
+  prioritizePinned?: boolean;
   pageSize?: number;
   refreshKey?: number;
 }) {
@@ -45,15 +47,20 @@ export function usePaginatedSongs({
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const isFetchingRef = useRef(true);
   const hasMoreRef = useRef(true);
+  const songCountRef = useRef(0);
   const filterKeyRef = useRef('');
   const filterKey = useMemo(
-    () => `${q ?? ''}::${categoryId ?? 'all'}::${artist ? artist.toLowerCase() : 'all'}::${status ?? 'all'}::${refreshKey}`,
-    [artist, categoryId, q, refreshKey, status]
+    () => `${q ?? ''}::${categoryId ?? 'all'}::${artist ? artist.toLowerCase() : 'all'}::${status ?? 'all'}::${prioritizePinned ? 'pinned' : 'standard'}::${refreshKey}`,
+    [artist, categoryId, prioritizePinned, q, refreshKey, status]
   );
 
   useEffect(() => {
     hasMoreRef.current = hasMore;
   }, [hasMore]);
+
+  useEffect(() => {
+    songCountRef.current = songs.length;
+  }, [songs]);
 
   useEffect(() => {
     isFetchingRef.current = isLoadingInitial || isLoadingMore;
@@ -68,7 +75,7 @@ export function usePaginatedSongs({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry?.isIntersecting || isFetchingRef.current || !hasMoreRef.current) {
+        if (!entry?.isIntersecting || isFetchingRef.current || !hasMoreRef.current || songCountRef.current === 0) {
           return;
         }
 
@@ -120,16 +127,23 @@ export function usePaginatedSongs({
             categoryId,
             artist,
             status,
+            prioritizePinned,
             page,
             pageSize
           },
           controller.signal
         );
 
-        setTotal(result.total);
+        if (!Array.isArray(result.items) || !Number.isFinite(result.total)) {
+          throw new Error('Invalid song list response.');
+        }
+
+        const nextTotal = Number(result.total);
+
+        setTotal(nextTotal);
         setSongs((currentSongs) => {
           const nextSongs = isFirstPage ? result.items : mergeSongs(currentSongs, result.items);
-          setHasMore(nextSongs.length < result.total);
+          setHasMore(nextSongs.length < nextTotal);
           return nextSongs;
         });
       } catch (loadError) {
@@ -152,7 +166,7 @@ export function usePaginatedSongs({
 
     void loadSongs();
     return () => controller.abort();
-  }, [artist, categoryId, filterKey, page, pageSize, q, status]);
+  }, [artist, categoryId, filterKey, page, pageSize, prioritizePinned, q, status]);
 
   return {
     songs,

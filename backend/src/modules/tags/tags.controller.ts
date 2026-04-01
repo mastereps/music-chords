@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
 
-import { createTag as createTagRecord, listTags } from './tags.service.js';
+import { createTag as createTagRecord, listTags } from './tags.service';
 
 const tagSchema = z.object({
   name: z.string().trim().min(1),

@@ -7,6 +7,7 @@ import type {
   PaginatedResponse,
   SongDetail,
   SongInput,
+  SongPinInput,
   SongRevision,
   SongSummary,
   SuggestionInput,
@@ -30,9 +31,21 @@ interface SongSearchParams {
   tag?: string;
   language?: string;
   status?: 'draft' | 'published';
+  prioritizePinned?: boolean;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
+
+function buildRequestUrl(path: string, method?: string) {
+  const url = `${API_BASE_URL}${path}`;
+  const normalizedMethod = (method ?? 'GET').toUpperCase();
+
+  if (normalizedMethod !== 'GET') {
+    return url;
+  }
+
+  return `${url}${url.includes('?') ? '&' : '?'}_rt=${Date.now()}`;
+}
 
 function toSongInput(song: SongDetail): SongInput {
   return {
@@ -68,7 +81,8 @@ function getErrorMessage(data: unknown) {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(buildRequestUrl(path, init?.method), {
+    cache: 'no-store',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
@@ -145,6 +159,14 @@ export const apiClient = {
       status,
       revisionNote: revisionNote ?? null
     });
+  },
+  async setSongPinned(id: number, input: SongPinInput) {
+    const data = await request<{ item: SongDetail }>(`/api/songs/${id}/pin`, {
+      method: 'PATCH',
+      body: JSON.stringify(input)
+    });
+
+    return data.item;
   },
   async deleteSong(id: number) {
     await request(`/api/songs/${id}`, { method: 'DELETE' });

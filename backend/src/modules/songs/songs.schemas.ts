@@ -19,6 +19,30 @@ export const suggestionSchema = z.object({
   proposedContent: z.string().refine((value) => value.trim().length > 0, 'Suggested content is required')
 });
 
+export const songPinSchema = z.object({
+  pinned: z.boolean()
+});
+
+const queryBooleanSchema = z.preprocess((value) => {
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+
+    if (normalized === '') {
+      return undefined;
+    }
+
+    if (normalized === 'true') {
+      return true;
+    }
+
+    if (normalized === 'false') {
+      return false;
+    }
+  }
+
+  return value;
+}, z.boolean().optional());
+
 export const songSearchSchema = z.object({
   q: z.string().trim().optional().transform((value) => value || undefined),
   page: z.coerce.number().int().min(1).default(1),
@@ -27,5 +51,6 @@ export const songSearchSchema = z.object({
   artist: z.string().trim().optional().transform((value) => value || undefined),
   tag: z.string().trim().optional().transform((value) => value || undefined),
   language: z.string().trim().optional().transform((value) => value || undefined),
-  status: z.enum(['draft', 'published']).optional()
+  status: z.enum(['draft', 'published']).optional(),
+  prioritizePinned: queryBooleanSchema.transform((value) => value ?? false)
 });

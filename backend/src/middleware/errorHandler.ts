@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 
-import { logger } from '../config/logger.js';
-import { AppError, toAppError } from '../utils/http.js';
+import { logger } from '../config/logger';
+import { AppError, toAppError } from '../utils/http';
 
 export function errorHandler(error: unknown, req: Request, res: Response, _next: NextFunction) {
   if (error instanceof ZodError) {

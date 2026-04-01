@@ -1,4 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-export function ArtistFilterSelect({ artists, value, onChange }) {
-    return (_jsxs("div", { className: "rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900", children: [_jsx("label", { htmlFor: "artist-filter", className: "text-sm font-semibold text-stone-700 dark:text-stone-200", children: "Artist" }), _jsxs("select", { id: "artist-filter", value: value, onChange: (event) => onChange(event.target.value), className: "mt-2 w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100", children: [_jsx("option", { value: "", children: "All" }), artists.map((artist) => (_jsx("option", { value: artist, children: artist }, artist)))] })] }));
-}

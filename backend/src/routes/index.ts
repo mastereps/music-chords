@@ -1,19 +1,19 @@
 import { Router } from 'express';
 
-import { login, logout, me } from '../modules/auth/auth.controller.js';
+import { login, logout, me } from '../modules/auth/auth.controller';
 import {
   createCategory,
   deleteCategory,
   getCategories,
   updateCategory
-} from '../modules/categories/categories.controller.js';
+} from '../modules/categories/categories.controller';
 import {
   createLineup,
   deleteLineup,
   getLineup,
   getLineups,
   updateLineup
-} from '../modules/lineups/lineups.controller.js';
+} from '../modules/lineups/lineups.controller';
 import {
   createSong,
   deleteSong,
@@ -22,10 +22,11 @@ import {
   listRevisions,
   searchSongs,
   suggestSongCorrection,
-  updateSong
-} from '../modules/songs/songs.controller.js';
-import { createTag, getTags } from '../modules/tags/tags.controller.js';
-import { requireAuth, requireRole } from '../middleware/auth.js';
+  updateSong,
+  updateSongPin
+} from '../modules/songs/songs.controller';
+import { createTag, getTags } from '../modules/tags/tags.controller';
+import { requireAuth, requireRole } from '../middleware/auth';
 
 export const apiRouter = Router();
 
@@ -37,6 +38,7 @@ apiRouter.get('/songs', searchSongs);
 apiRouter.get('/songs/:slug', getSong);
 apiRouter.post('/songs', requireAuth, requireRole('admin', 'editor'), createSong);
 apiRouter.put('/songs/:id', requireAuth, requireRole('admin', 'editor'), updateSong);
+apiRouter.patch('/songs/:id/pin', requireAuth, requireRole('admin'), updateSongPin);
 apiRouter.delete('/songs/:id', requireAuth, requireRole('admin'), deleteSong);
 apiRouter.post('/songs/:id/suggestions', suggestSongCorrection);
 apiRouter.get('/songs/:id/revisions', requireAuth, requireRole('admin', 'editor'), listRevisions);

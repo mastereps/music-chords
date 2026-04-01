@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS songs (
   artist VARCHAR(255),
   song_key VARCHAR(20) NOT NULL,
   slug VARCHAR(255) NOT NULL UNIQUE,
+  is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
   content TEXT NOT NULL,
   category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
   language VARCHAR(80),

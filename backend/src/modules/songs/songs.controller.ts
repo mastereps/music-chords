@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 
-import type { SongInput } from '@music-chords/shared';
+import type { SongInput, SongPinInput } from '@music-chords/shared';
 
-import { AppError, assertFound } from '../../utils/http.js';
+import { AppError, assertFound } from '../../utils/http';
 import {
   createSong as createSongRecord,
   createSuggestion,
@@ -11,9 +11,10 @@ import {
   getSongBySlug,
   getSongRevisions,
   listSongs,
+  setSongPinned,
   updateSong as updateSongRecord
-} from './songs.service.js';
-import { songSchema, songSearchSchema, suggestionSchema } from './songs.schemas.js';
+} from './songs.service';
+import { songPinSchema, songSchema, songSearchSchema, suggestionSchema } from './songs.schemas';
 
 function canViewDrafts(req: Request) {
   return req.authRole === 'admin' || req.authRole === 'editor';
@@ -48,6 +49,16 @@ export async function updateSong(req: Request, res: Response) {
 
   const payload = songSchema.parse(req.body);
   const song = await updateSongRecord(Number(req.params.id), payload as SongInput, req.authUser);
+  res.status(200).json({ item: song });
+}
+
+export async function updateSongPin(req: Request, res: Response) {
+  if (!req.authUser) {
+    throw new AppError('Authentication required', 401);
+  }
+
+  const payload = songPinSchema.parse(req.body);
+  const song = await setSongPinned(Number(req.params.id), payload as SongPinInput, req.authUser);
   res.status(200).json({ item: song });
 }
 

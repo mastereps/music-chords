@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { loginSchema } from '../modules/auth/auth.schemas.js';
-import { songSchema, songSearchSchema, suggestionSchema } from '../modules/songs/songs.schemas.js';
+import { loginSchema } from '../modules/auth/auth.schemas';
+import { songPinSchema, songSchema, songSearchSchema, suggestionSchema } from '../modules/songs/songs.schemas';
 
 describe('songSchema', () => {
   it('accepts a valid song payload', () => {
@@ -62,6 +62,22 @@ describe('songSearchSchema', () => {
     expect(result.q).toBeUndefined();
     expect(result.tag).toBeUndefined();
     expect(result.artist).toBeUndefined();
+  });
+
+  it('parses prioritizePinned query values', () => {
+    expect(songSearchSchema.parse({ prioritizePinned: 'true' }).prioritizePinned).toBe(true);
+    expect(songSearchSchema.parse({ prioritizePinned: 'false' }).prioritizePinned).toBe(false);
+    expect(songSearchSchema.parse({}).prioritizePinned).toBe(false);
+  });
+});
+
+describe('songPinSchema', () => {
+  it('accepts a boolean pinned payload', () => {
+    expect(songPinSchema.parse({ pinned: true }).pinned).toBe(true);
+  });
+
+  it('rejects a non-boolean pinned payload', () => {
+    expect(() => songPinSchema.parse({ pinned: 'true' })).toThrow();
   });
 });
 

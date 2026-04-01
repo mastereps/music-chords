@@ -29,12 +29,16 @@ export function SongsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<number | undefined>(undefined);
   const [selectedArtist, setSelectedArtist] = useState<ArtistFilterValue>('');
+  const [refreshKey, setRefreshKey] = useState(0);
   const debouncedQuery = useDebouncedValue(query, 250);
+  const prioritizePinned = !debouncedQuery && !activeCategoryId && !selectedArtist;
   const { songs, total, hasMore, isLoadingInitial, isLoadingMore, error, loadMoreRef } = usePaginatedSongs({
     q: debouncedQuery,
     categoryId: activeCategoryId,
     artist: selectedArtist || undefined,
-    pageSize: PAGE_SIZE
+    prioritizePinned,
+    pageSize: PAGE_SIZE,
+    refreshKey
   });
 
   useEffect(() => {
@@ -68,8 +72,12 @@ export function SongsPage() {
       filterParts.push(`Artist: ${selectedArtist}`);
     }
 
+    if (prioritizePinned) {
+      filterParts.push('Pinned songs first');
+    }
+
     return filterParts.length > 0 ? filterParts.join(' | ') : 'Use short, specific titles for faster matching.';
-  }, [debouncedQuery, activeCategoryName, selectedArtist]);
+  }, [activeCategoryName, debouncedQuery, prioritizePinned, selectedArtist]);
 
   return (
     <div className="space-y-4">
@@ -114,7 +122,7 @@ export function SongsPage() {
           </div>
         ) : null}
         {songs.map((song) => (
-          <SongCard key={song.id} song={song} />
+          <SongCard key={song.id} song={song} onPinnedChange={() => setRefreshKey((currentValue) => currentValue + 1)} />
         ))}
         <div
           ref={loadMoreRef}

@@ -4,6 +4,7 @@ import type {
   PaginatedResponse,
   SongDetail,
   SongInput,
+  SongPinInput,
   SongRevision,
   SongStatus,
   SongSummary,
@@ -12,8 +13,8 @@ import type {
 } from '@music-chords/shared';
 import type { PoolClient } from 'pg';
 
-import { pool, query } from '../../config/db.js';
-import { AppError, assertFound } from '../../utils/http.js';
+import { pool, query } from '../../config/db';
+import { AppError, assertFound } from '../../utils/http';
 
 interface SongSearchFilters {
   q?: string;
@@ -24,6 +25,7 @@ interface SongSearchFilters {
   tag?: string;
   language?: string;
   status?: SongStatus;
+  prioritizePinned: boolean;
 }
 
 interface SongListRow {
@@ -32,6 +34,7 @@ interface SongListRow {
   artist: string | null;
   song_key: string;
   slug: string;
+  is_pinned: boolean;
   language: string | null;
   status: SongStatus;
   updated_at: string;
@@ -69,6 +72,7 @@ function mapSongSummary(row: SongListRow): SongSummary {
     artist: row.artist,
     key: row.song_key,
     slug: row.slug,
+    isPinned: row.is_pinned,
     category: row.category,
     tags: row.tags ?? [],
     language: row.language,
@@ -175,16 +179,57 @@ function buildSongQueryParts(filters: SongSearchFilters, canViewDrafts: boolean)
   };
 }
 
-function listQuery(whereClause: string, rankExpression: string, limitPlaceholder: number, offsetPlaceholder: number) {
+function buildSongOrderClause({
+  prioritizePinned,
+  hasSearchQuery,
+  searchRankColumn
+}: {
+  prioritizePinned: boolean;
+  hasSearchQuery: boolean;
+  searchRankColumn: string;
+}) {
+  const orderParts: string[] = [];
+
+  if (prioritizePinned) {
+    orderParts.push('s.is_pinned DESC');
+  }
+
+  if (hasSearchQuery) {
+    orderParts.push(`${searchRankColumn} DESC`);
+  }
+
+  orderParts.push('LOWER(s.title) ASC', 's.title ASC', 's.id ASC');
+
+  return orderParts.join(', ');
+}
+
+function listQuery(
+  whereClause: string,
+  rankExpression: string,
+  limitPlaceholder: number,
+  offsetPlaceholder: number,
+  prioritizePinned: boolean,
+  hasSearchQuery: boolean
+) {
+  const filteredSongOrder = buildSongOrderClause({
+    prioritizePinned,
+    hasSearchQuery,
+    searchRankColumn: 'search_rank'
+  });
+  const finalOrder = buildSongOrderClause({
+    prioritizePinned,
+    hasSearchQuery,
+    searchRankColumn: 'fs.search_rank'
+  });
+
   return `
     WITH filtered_songs AS (
       SELECT
         s.id,
-        ${rankExpression} AS search_rank,
-        s.title
+        ${rankExpression} AS search_rank
       FROM songs s
       ${whereClause}
-      ORDER BY LOWER(s.title) ASC, s.title ASC, search_rank DESC, s.id ASC
+      ORDER BY ${filteredSongOrder}
       LIMIT $${limitPlaceholder}
       OFFSET $${offsetPlaceholder}
     )
@@ -194,6 +239,7 @@ function listQuery(whereClause: string, rankExpression: string, limitPlaceholder
       s.artist,
       s.song_key,
       s.slug,
+      s.is_pinned,
       s.language,
       s.status,
       s.updated_at::text,
@@ -220,7 +266,7 @@ function listQuery(whereClause: string, rankExpression: string, limitPlaceholder
     LEFT JOIN song_tags st ON st.song_id = s.id
     LEFT JOIN tags t ON t.id = st.tag_id
     GROUP BY s.id, c.id, fs.search_rank
-    ORDER BY LOWER(s.title) ASC, s.title ASC, fs.search_rank DESC, s.id ASC;
+    ORDER BY ${finalOrder};
   `;
 }
 
@@ -247,6 +293,7 @@ async function fetchSongDetailByCondition(whereClause: string, values: unknown[]
        s.artist,
        s.song_key,
        s.slug,
+       s.is_pinned,
        s.content,
        s.language,
        s.status,
@@ -297,7 +344,10 @@ export async function listSongs(filters: SongSearchFilters, canViewDrafts: boole
   const paginationValues = [...values, filters.pageSize, (filters.page - 1) * filters.pageSize];
 
   const [itemsResult, totalResult] = await Promise.all([
-    query<SongListRow>(listQuery(clause, rankExpression, paginationValues.length - 1, paginationValues.length), paginationValues),
+    query<SongListRow>(
+      listQuery(clause, rankExpression, paginationValues.length - 1, paginationValues.length, filters.prioritizePinned, Boolean(filters.q)),
+      paginationValues
+    ),
     query<{ total: string }>(`SELECT COUNT(*)::text AS total FROM songs s ${clause}`, values)
   ]);
 
@@ -425,6 +475,21 @@ export async function updateSong(id: number, input: SongInput, actor: AuthUser) 
   }
 }
 
+export async function setSongPinned(id: number, input: SongPinInput, actor: AuthUser) {
+  const result = await query<{ id: number }>(
+    `UPDATE songs
+     SET is_pinned = $2,
+         updated_by = $3
+     WHERE id = $1
+     RETURNING id`,
+    [id, input.pinned, actor.id]
+  );
+
+  assertFound(result.rows[0], 'Song not found');
+
+  return assertFound(await getSongById(id), 'Song not found after pin update');
+}
+
 export async function deleteSong(id: number) {
   const result = await query<{ id: number }>('DELETE FROM songs WHERE id = $1 RETURNING id', [id]);
   assertFound(result.rows[0], 'Song not found');
@@ -495,5 +560,6 @@ export async function getDashboardStats() {
     pendingSuggestions: Number(row.pending_suggestions)
   };
 }
+
 
 

@@ -31,6 +31,7 @@ export interface SongSummary {
   artist: string | null;
   key: string;
   slug: string;
+  isPinned: boolean;
   category: Category | null;
   tags: Tag[];
   language: string | null;
@@ -73,6 +74,10 @@ export interface SongInput {
   language?: string | null;
   status: SongStatus;
   revisionNote?: string | null;
+}
+
+export interface SongPinInput {
+  pinned: boolean;
 }
 
 export interface SuggestionInput {

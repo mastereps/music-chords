@@ -1,8 +1,8 @@
 import type { AuthUser, LineupDetail, LineupInput, LineupSong, LineupSummary } from '@music-chords/shared';
 import type { PoolClient } from 'pg';
 
-import { pool, query } from '../../config/db.js';
-import { AppError, assertFound } from '../../utils/http.js';
+import { pool, query } from '../../config/db';
+import { AppError, assertFound } from '../../utils/http';
 
 interface LineupSummaryRow {
   id: number;

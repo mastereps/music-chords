@@ -2,15 +2,15 @@ import type { Request, Response } from 'express';
 
 import type { LineupInput } from '@music-chords/shared';
 
-import { AppError, assertFound } from '../../utils/http.js';
+import { AppError, assertFound } from '../../utils/http';
 import {
   createLineup as createLineupRecord,
   deleteLineup as deleteLineupRecord,
   getLineupById,
   listLineups,
   updateLineup as updateLineupRecord
-} from './lineups.service.js';
-import { lineupParamsSchema, lineupSchema } from './lineups.schemas.js';
+} from './lineups.service';
+import { lineupParamsSchema, lineupSchema } from './lineups.schemas';
 
 export async function getLineups(_req: Request, res: Response) {
   const items = await listLineups();

@@ -3,8 +3,8 @@ import jwt from 'jsonwebtoken';
 
 import type { AuthUser, RoleName } from '@music-chords/shared';
 
-import { env } from '../config/env.js';
-import { AppError } from '../utils/http.js';
+import { env } from '../config/env';
+import { AppError } from '../utils/http';
 
 export const AUTH_COOKIE_NAME = 'music_chords_token';
 

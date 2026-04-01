@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express';
 
-import { AppError } from '../../utils/http.js';
-import { loginSchema } from './auth.schemas.js';
+import { AppError } from '../../utils/http';
+import { loginSchema } from './auth.schemas';
 import {
   authenticateUser,
   AUTH_COOKIE_NAME,
   clearAuthCookie,
   getAuthCookieOptions,
   signAuthToken
-} from './auth.service.js';
+} from './auth.service';
 
 export async function login(req: Request, res: Response) {
   const payload = loginSchema.parse(req.body);

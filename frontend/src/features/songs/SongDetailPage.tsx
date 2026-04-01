@@ -9,6 +9,7 @@ import { apiClient } from '../../api/client';
 import { ChordSheet } from '../../components/ChordSheet';
 import { FontSizeControls } from '../../components/FontSizeControls';
 import { RevisionList } from '../../components/RevisionList';
+import { SongPinButton } from '../../components/SongPinButton';
 import { SuggestionForm } from '../../components/SuggestionForm';
 import { TransposeControls } from '../../components/TransposeControls';
 import { ActiveLineupFab } from '../lineups/ActiveLineupFab';
@@ -24,6 +25,7 @@ export function SongDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isEditor = user?.role === 'admin' || user?.role === 'editor';
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     const controller = new AbortController();
@@ -49,7 +51,7 @@ export function SongDetailPage() {
   }, [slug]);
 
   useEffect(() => {
-    if (!song || !isEditor) {
+    if (!song?.id || !isEditor) {
       setRevisions([]);
       return;
     }
@@ -57,7 +59,7 @@ export function SongDetailPage() {
     const controller = new AbortController();
     void apiClient.getRevisions(song.id, controller.signal).then(setRevisions).catch(() => setRevisions([]));
     return () => controller.abort();
-  }, [song, isEditor]);
+  }, [isEditor, song?.id]);
 
   const displayedContent = useMemo(() => (song ? transposeContent(song.content, offset) : ''), [song, offset]);
   const displayedKey = useMemo(() => (song ? transposeChordToken(song.key, offset) : ''), [song, offset]);
@@ -77,14 +79,24 @@ export function SongDetailPage() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">{song.category?.name ?? 'Uncategorized'}</p>
-              <h2 className="mt-2 text-2xl font-semibold">{song.title}</h2>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <h2 className="text-2xl font-semibold">{song.title}</h2>
+                {song.isPinned ? (
+                  <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-800 dark:bg-amber-500/20 dark:text-amber-200">
+                    Pinned
+                  </span>
+                ) : null}
+              </div>
               <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">{song.artist || 'Unknown artist'}</p>
             </div>
-            {isEditor ? (
-              <Link to={`/admin/songs/${song.slug}/edit`} className="rounded-2xl bg-brand-700 px-4 py-3 text-sm font-semibold text-white">
-                Edit song
-              </Link>
-            ) : null}
+            <div className="flex flex-wrap items-start justify-end gap-2">
+              {isEditor ? (
+                <Link to={`/admin/songs/${song.slug}/edit`} className="rounded-2xl bg-brand-700 px-4 py-3 text-sm font-semibold text-white">
+                  Edit song
+                </Link>
+              ) : null}
+              {isAdmin ? <SongPinButton songId={song.id} isPinned={song.isPinned} onSuccess={setSong} /> : null}
+            </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-2 text-xs text-stone-500 dark:text-stone-400">
             <span className="rounded-full bg-stone-100 px-3 py-1 dark:bg-stone-800">Original key {song.key}</span>

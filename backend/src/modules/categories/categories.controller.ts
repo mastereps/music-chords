@@ -5,8 +5,8 @@ import {
   deleteCategory as deleteCategoryRecord,
   listCategories,
   updateCategory as updateCategoryRecord
-} from './categories.service.js';
-import { categorySchema } from './categories.schemas.js';
+} from './categories.service';
+import { categorySchema } from './categories.schemas';
 
 export async function getCategories(_req: Request, res: Response) {
   const categories = await listCategories();
