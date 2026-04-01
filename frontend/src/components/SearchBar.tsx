@@ -12,7 +12,7 @@ export function SearchBar({
   onChange,
   onClear,
   label = 'Search songs',
-  placeholder = 'Title, artist, tag, category, chords',
+  placeholder = 'Title, artist, tag, category',
   sticky = true
 }: SearchBarProps) {
   return (

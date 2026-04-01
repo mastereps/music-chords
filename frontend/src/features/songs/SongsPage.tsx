@@ -86,7 +86,7 @@ export function SongsPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">Chords only</p>
           <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Readable chord sheets built for phone screens.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600 dark:text-stone-300">
-            Search by title, artist, category, tag, or chord content. Open a song fast, transpose it, and keep the layout readable during practice.
+            Search by title, artist, category, or tag. Open a song fast, transpose it, and keep the layout readable during practice.
           </p>
         </div>
         <div className="rounded-[2rem] border border-stone-200 bg-brand-900 p-5 text-brand-50 shadow-panel">

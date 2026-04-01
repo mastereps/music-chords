@@ -61,8 +61,7 @@ interface RevisionRow {
 
 const SONG_SEARCH_VECTOR = `
   setweight(to_tsvector('simple', COALESCE(s.title, '')), 'A') ||
-  setweight(to_tsvector('simple', COALESCE(s.artist, '')), 'B') ||
-  setweight(to_tsvector('simple', COALESCE(s.content, '')), 'C')
+  setweight(to_tsvector('simple', COALESCE(s.artist, '')), 'B')
 `;
 
 function mapSongSummary(row: SongListRow): SongSummary {

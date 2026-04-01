@@ -21,7 +21,7 @@ Mobile-first web app for viewing, searching, transposing, and managing chord she
 
 ## Core Features
 
-- Fast mobile song search with sticky search bar
+- Fast mobile song search by title, artist, category, tag, and language with sticky search bar
 - Clean chord sheet viewer with monospaced formatting
 - Chord transposition up/down with sharps/flats support
 - Font size controls and dark mode
@@ -83,7 +83,7 @@ Default seeded admin credentials:
 ### Songs
 
 - `GET /api/songs`
-  - query: `q`, `page`, `pageSize`, `categoryId`, `tag`, `language`, `status`
+  - query: `q`, `page`, `pageSize`, `categoryId`, `tag`, `language`, `status`, `prioritizePinned`
 - `GET /api/songs/:slug`
 - `POST /api/songs`
 - `PUT /api/songs/:id`
@@ -124,7 +124,7 @@ Tables included:
 - `song_revisions`
 - `correction_suggestions`
 
-Indexes are included for slug lookup, status/category filtering, updated ordering, trigram matching, and weighted text search over song title, artist, and content.
+Indexes are included for slug lookup, status/category filtering, updated ordering, trigram matching, and weighted text search over song title and artist.
 
 ## Testing Scope
 
