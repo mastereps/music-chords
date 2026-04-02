@@ -28,7 +28,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="mx-auto max-w-md rounded-[2rem] border border-stone-200 bg-white p-6 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+    <div className="mx-auto max-w-md rounded-[2rem] border border-stone-200 bg-white p-6  dark:border-stone-800 dark:bg-stone-900">
       <p className="text-xs uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">Admin access</p>
       <h2 className="mt-2 text-2xl font-semibold">Login for editing and review</h2>
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">

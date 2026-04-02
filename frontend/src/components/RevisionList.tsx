@@ -4,7 +4,7 @@ import { formatDate } from '../utils/date';
 
 export function RevisionList({ items }: { items: SongRevision[] }) {
   return (
-    <div className="rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+    <div className="rounded-3xl border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900">
       <h3 className="text-base font-semibold">Revision history</h3>
       <div className="mt-4 space-y-4">
         {items.length ? (

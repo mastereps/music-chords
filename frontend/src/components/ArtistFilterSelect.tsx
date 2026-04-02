@@ -8,7 +8,7 @@ export function ArtistFilterSelect({
   onChange: (artist: string) => void;
 }) {
   return (
-    <div className="rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+    <div className="rounded-3xl border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900">
       <label htmlFor="artist-filter" className="text-sm font-semibold text-stone-700 dark:text-stone-200">
         Artist
       </label>

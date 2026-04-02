@@ -75,7 +75,7 @@ export function SongDetailPage() {
   return (
     <div className="grid gap-4 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
       <section className="space-y-4">
-        <div className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+        <div className="rounded-[2rem] border border-stone-200 bg-white p-5  dark:border-stone-800 dark:bg-stone-900">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">{song.category?.name ?? 'Uncategorized'}</p>
@@ -113,7 +113,7 @@ export function SongDetailPage() {
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+        <div className="rounded-[2rem] border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <TransposeControls offset={offset} onDecrease={() => setOffset((value) => value - 1)} onIncrease={() => setOffset((value) => value + 1)} onReset={() => setOffset(0)} />
             <FontSizeControls fontSize={fontSize} onDecrease={() => setFontSize((value) => Math.max(13, value - 1))} onIncrease={() => setFontSize((value) => Math.min(28, value + 1))} />

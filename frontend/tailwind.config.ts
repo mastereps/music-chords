@@ -24,9 +24,10 @@ export default {
         mono: ['"IBM Plex Mono"', 'monospace']
       },
       boxShadow: {
-        panel: '0 12px 40px rgba(18, 27, 12, 0.12)'
+        panel: '0 12px 28px rgba(41, 37, 36, 0.08)'
       }
     }
   },
   plugins: []
 } satisfies Config;
+

@@ -17,7 +17,7 @@ export function SearchBar({
 }: SearchBarProps) {
   return (
     <div
-      className={`${sticky ? 'sticky top-20 z-20' : ''} w-full min-w-0 rounded-3xl border border-stone-200 bg-stone-50/95 p-3 shadow-panel backdrop-blur dark:border-stone-800 dark:bg-stone-900/95`}
+      className={`${sticky ? 'sticky top-20 z-20' : ''} w-full min-w-0 rounded-3xl border border-stone-200 bg-white/95 p-3  backdrop-blur dark:border-stone-800 dark:bg-stone-900/95`}
     >
       <label className="block text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 dark:text-stone-400">{label}</label>
       <div className="mt-2 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
@@ -38,3 +38,4 @@ export function SearchBar({
     </div>
   );
 }
+

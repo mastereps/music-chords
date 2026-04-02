@@ -5,13 +5,13 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  background-color: #f5f3ef;
-}
-
-:root.dark {
   color-scheme: dark;
   background-color: #101711;
+}
+
+:root:not(.dark) {
+  color-scheme: light;
+  background-color: #f3f0e7;
 }
 
 html,
@@ -46,3 +46,4 @@ textarea {
 * {
   box-sizing: border-box;
 }
+

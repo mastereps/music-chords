@@ -8,7 +8,7 @@ export function AppLayout() {
   const { user, logout } = useAuth();
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const stored = window.localStorage.getItem('theme');
-    return stored === 'dark' ? 'dark' : 'light';
+    return stored === 'light' ? 'light' : 'dark';
   });
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function AppLayout() {
   }, [theme]);
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-[radial-gradient(circle_at_top,_rgba(111,144,84,0.16),_transparent_40%),linear-gradient(180deg,_#f7f8f4_0%,_#f5f3ef_100%)] text-stone-900 dark:bg-[linear-gradient(180deg,_#172014_0%,_#101711_100%)] dark:text-stone-100">
+    <div className="min-h-screen overflow-x-clip bg-[#f3f0e7] text-stone-900 dark:bg-[linear-gradient(180deg,_#172014_0%,_#101711_100%)] dark:text-stone-100">
       <header className="sticky top-0 z-30 border-b border-stone-200/80 bg-stone-50/95 backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <Link to="/" className="flex min-w-0 items-center justify-center gap-3 sm:justify-start">
@@ -73,5 +73,4 @@ export function AppLayout() {
     </div>
   );
 }
-
 

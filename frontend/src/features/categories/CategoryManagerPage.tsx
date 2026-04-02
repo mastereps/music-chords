@@ -85,7 +85,7 @@ export function CategoryManagerPage() {
             setIsSaving(false);
           }
         }}
-        className="space-y-4 rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900"
+        className="space-y-4 rounded-3xl border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900"
       >
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">Categories</p>
@@ -137,7 +137,7 @@ export function CategoryManagerPage() {
 
       <div className="space-y-3">
         {orderedCategories.map((category) => (
-          <div key={category.id} className="rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+          <div key={category.id} className="rounded-3xl border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900">
             <div className="flex flex-wrap items-center justify-between gap-2" style={{ paddingLeft: `${category.depth * 8}px` }}>
               <div>
                 <h3 className="text-lg font-semibold">{category.name}</h3>

@@ -30,7 +30,7 @@ export function SuggestionForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+    <form onSubmit={handleSubmit} className="space-y-3 rounded-3xl border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900">
       <div>
         <h3 className="text-base font-semibold">Suggest a correction</h3>
         <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">Use this if you spot a typo or wrong chord.</p>

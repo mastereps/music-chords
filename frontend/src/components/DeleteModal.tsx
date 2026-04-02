@@ -13,7 +13,7 @@ export function DeleteModal({ isOpen, title, message, onConfirm, onCancel }: Del
 
   return (
     <div className="fixed inset-0 z-40 flex items-end bg-black/50 p-4 sm:items-center sm:justify-center">
-      <div className="w-full max-w-md rounded-3xl bg-white p-5 shadow-panel dark:bg-stone-900">
+      <div className="w-full max-w-md rounded-3xl bg-white p-5  dark:bg-stone-900">
         <h3 className="text-lg font-semibold">{title}</h3>
         <p className="mt-2 text-sm text-stone-600 dark:text-stone-300">{message}</p>
         <div className="mt-5 flex gap-2">

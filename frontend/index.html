@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/images/maranatha_music_logo.png" />
     <link rel="apple-touch-icon" href="/images/maranatha_music_logo.png" />
+    <script>
+      (() => {
+        const storedTheme = window.localStorage.getItem('theme');
+        const theme = storedTheme === 'light' ? 'light' : 'dark';
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
     <title>M-chords</title>
   </head>
-  <body class="bg-stone-50">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
-

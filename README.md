@@ -21,10 +21,10 @@ Mobile-first web app for viewing, searching, transposing, and managing chord she
 
 ## Core Features
 
-- Fast mobile song search by title, artist, category, tag, and language with sticky search bar
+- Fast mobile song search by title, artist, category, tag, and language with sticky search bar and overflow-safe song cards
 - Clean chord sheet viewer with monospaced formatting
 - Chord transposition up/down with sharps/flats support
-- Font size controls and dark mode
+- Font size controls and a dark mode toggle with dark as the default first-load theme
 - Admin/editor authentication and role-based access
 - CRUD for songs and categories
 - Suggest correction flow for non-editors
@@ -138,3 +138,4 @@ Indexes are included for slug lookup, status/category filtering, updated orderin
 - Terminate TLS before the backend and keep cookie `secure` enabled in production
 - Add PostgreSQL backups and monitoring before deployment
 # music-chords
+

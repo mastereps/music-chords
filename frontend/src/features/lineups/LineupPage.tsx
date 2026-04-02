@@ -227,7 +227,7 @@ export function LineupPage({ mode = 'detail' }: { mode?: 'detail' | 'create' }) 
   return (
     <>
       <div className="space-y-4 pb-24">
-        <section className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+        <section className="rounded-[2rem] border border-stone-200 bg-white p-5  dark:border-stone-800 dark:bg-stone-900">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">
@@ -252,7 +252,7 @@ export function LineupPage({ mode = 'detail' }: { mode?: 'detail' | 'create' }) 
 
         <div className={`grid gap-4 ${canManageLineups ? 'lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]' : ''}`}>
           <section className="space-y-4">
-            <div className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+            <div className="rounded-[2rem] border border-stone-200 bg-white p-5  dark:border-stone-800 dark:bg-stone-900">
               {canManageLineups ? (
                 <div className="space-y-4">
                   <div className="grid gap-4">
@@ -324,7 +324,7 @@ export function LineupPage({ mode = 'detail' }: { mode?: 'detail' | 'create' }) 
               )}
             </div>
 
-            <div className="rounded-[2rem] border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+            <div className="rounded-[2rem] border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold text-stone-900 dark:text-white">Songs in order</p>
@@ -405,7 +405,7 @@ export function LineupPage({ mode = 'detail' }: { mode?: 'detail' | 'create' }) 
                 placeholder="Find songs to add to this lineup"
               />
 
-              <div className="rounded-[2rem] border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+              <div className="rounded-[2rem] border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-stone-900 dark:text-white">Library results</p>

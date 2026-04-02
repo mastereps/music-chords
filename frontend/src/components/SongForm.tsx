@@ -87,7 +87,7 @@ export function SongForm({ categories, tags, initialValue, submitLabel, onSubmit
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-stone-200 bg-white p-4 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl border border-stone-200 bg-white p-4  dark:border-stone-800 dark:bg-stone-900">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="space-y-2">
           <span className="text-sm font-semibold">Title</span>

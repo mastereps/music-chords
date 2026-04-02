@@ -80,16 +80,16 @@ export function SongsPage() {
   }, [activeCategoryName, debouncedQuery, prioritizePinned, selectedArtist]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-x-hidden">
       <section className="hidden gap-4 sm:grid lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-panel dark:border-stone-800 dark:bg-stone-900">
+        <div className="rounded-[2rem] border border-stone-200 bg-white p-5  dark:border-stone-800 dark:bg-stone-900">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300">Chords only</p>
           <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Readable chord sheets built for phone screens.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600 dark:text-stone-300">
             Search by title, artist, category, or tag. Open a song fast, transpose it, and keep the layout readable during practice.
           </p>
         </div>
-        <div className="rounded-[2rem] border border-stone-200 bg-brand-900 p-5 text-brand-50 shadow-panel">
+        <div className="rounded-[2rem] border border-stone-200 bg-brand-900 p-5 text-brand-50 ">
           <p className="text-sm uppercase tracking-[0.25em] text-brand-200">Current results</p>
           <p className="mt-3 text-4xl font-semibold">{total}</p>
           <p className="mt-2 text-sm text-brand-100">{activeResultsLabel}</p>
@@ -102,20 +102,20 @@ export function SongsPage() {
 
       <CategoryPills items={categories} activeCategoryId={activeCategoryId} onSelect={setActiveCategoryId} />
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-sm text-stone-500 dark:text-stone-400">
-        <span>
+      <div className="flex min-w-0 flex-col gap-1 px-1 text-sm text-stone-500 dark:text-stone-400 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+        <p className="min-w-0">
           {isLoadingInitial
             ? 'Loading songs...'
             : total > songs.length
               ? `${songs.length} of ${total} songs loaded`
               : `${songs.length} songs loaded`}
-        </span>
-        <span>{activeFilterDescription}</span>
+        </p>
+        <p className="min-w-0 break-words sm:text-right">{activeFilterDescription}</p>
       </div>
 
       {error ? <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
-      <div className="grid w-full gap-3 pb-6">
+      <div className="grid w-full min-w-0 gap-3 overflow-x-hidden pb-6">
         {!isLoadingInitial && songs.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-stone-300 px-4 py-10 text-center text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400">
             No songs matched your current filters.
@@ -127,7 +127,7 @@ export function SongsPage() {
         <div
           ref={loadMoreRef}
           aria-hidden="true"
-          className={songs.length > 0 ? 'flex min-h-14 items-center justify-center px-2 py-2 text-sm text-stone-500 dark:text-stone-400' : 'h-px'}
+          className={songs.length > 0 ? 'flex min-h-14 min-w-0 items-center justify-center px-2 py-2 text-sm text-stone-500 dark:text-stone-400' : 'h-px'}
         >
           {songs.length > 0 ? (isLoadingMore ? 'Loading more songs...' : hasMore ? 'Scroll to load more songs' : 'End of song list') : null}
         </div>

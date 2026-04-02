@@ -11,15 +11,15 @@ export function SongCard({ song, onPinnedChange }: { song: SongSummary; onPinned
   const isAdmin = user?.role === 'admin';
 
   return (
-    <article className="relative rounded-[1.75rem] border border-stone-200 bg-white shadow-panel dark:border-stone-800 dark:bg-stone-900">
+    <article className="relative w-full min-w-0 overflow-hidden rounded-[1.75rem] border border-stone-200 bg-white  dark:border-stone-800 dark:bg-stone-900">
       <Link
         to={`/songs/${song.slug}`}
-        className={`block rounded-[1.75rem] p-4 transition hover:-translate-y-0.5 ${isAdmin ? 'pr-24' : ''}`}
+        className={`block w-full min-w-0 rounded-[1.75rem] p-4 transition hover:-translate-y-0.5 ${isAdmin ? 'pr-24' : ''}`}
       >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-lg font-semibold text-stone-900 dark:text-white">{song.title}</h3>
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <h3 className="min-w-0 break-words text-lg font-semibold text-stone-900 dark:text-white">{song.title}</h3>
               {song.isPinned ? (
                 <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-800 dark:bg-amber-500/20 dark:text-amber-200">
                   Pinned
@@ -33,15 +33,15 @@ export function SongCard({ song, onPinnedChange }: { song: SongSummary; onPinned
           </span>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2 text-xs text-stone-500 dark:text-stone-400">
-          {song.category ? <span className="max-w-[9rem] truncate rounded-full bg-stone-100 px-3 py-1 dark:bg-stone-800 sm:max-w-none">{song.category.name}</span> : null}
-          {song.language ? <span className="max-w-[9rem] truncate rounded-full bg-stone-100 px-3 py-1 dark:bg-stone-800 sm:max-w-none">{song.language}</span> : null}
+        <div className="mt-4 flex min-w-0 flex-wrap gap-2 text-xs text-stone-500 dark:text-stone-400">
+          {song.category ? <span className="max-w-[9rem] min-w-0 truncate rounded-full bg-stone-100 px-3 py-1 dark:bg-stone-800 sm:max-w-none">{song.category.name}</span> : null}
+          {song.language ? <span className="max-w-[9rem] min-w-0 truncate rounded-full bg-stone-100 px-3 py-1 dark:bg-stone-800 sm:max-w-none">{song.language}</span> : null}
           {song.tags.slice(0, 3).map((tag) => (
-            <span key={tag.id} className="max-w-[9rem] truncate rounded-full bg-stone-100 px-3 py-1 dark:bg-stone-800 sm:max-w-none">
+            <span key={tag.id} className="max-w-[9rem] min-w-0 truncate rounded-full bg-stone-100 px-3 py-1 dark:bg-stone-800 sm:max-w-none">
               #{tag.name}
             </span>
           ))}
-          <span className="basis-full text-stone-500 sm:ml-auto sm:basis-auto dark:text-stone-400">Updated {formatDate(song.updatedAt)}</span>
+          <span className="basis-full min-w-0 text-stone-500 sm:ml-auto sm:basis-auto dark:text-stone-400">Updated {formatDate(song.updatedAt)}</span>
         </div>
       </Link>
 
