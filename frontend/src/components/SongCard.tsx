@@ -2,13 +2,20 @@ import { Link } from 'react-router-dom';
 
 import type { SongDetail, SongSummary } from '@music-chords/shared';
 
+import { useAuth } from '../app/AuthProvider';
 import { formatDate } from '../utils/date';
 import { SongPinButton } from './SongPinButton';
 
 export function SongCard({ song, onPinnedChange }: { song: SongSummary; onPinnedChange?: (updatedSong: SongDetail) => void }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
   return (
     <article className="relative rounded-[1.75rem] border border-stone-200 bg-white shadow-panel dark:border-stone-800 dark:bg-stone-900">
-      <Link to={`/songs/${song.slug}`} className="block rounded-[1.75rem] p-4 pr-24 transition hover:-translate-y-0.5">
+      <Link
+        to={`/songs/${song.slug}`}
+        className={`block rounded-[1.75rem] p-4 transition hover:-translate-y-0.5 ${isAdmin ? 'pr-24' : ''}`}
+      >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -38,14 +45,16 @@ export function SongCard({ song, onPinnedChange }: { song: SongSummary; onPinned
         </div>
       </Link>
 
-      <div className="absolute right-4 top-4 z-10">
-        <SongPinButton
-          songId={song.id}
-          isPinned={song.isPinned}
-          className="rounded-full border border-stone-300 px-3 py-1.5 text-xs font-semibold text-stone-700 transition hover:border-brand-500 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-stone-700 dark:text-stone-200 dark:hover:border-brand-400 dark:hover:text-brand-200"
-          onSuccess={onPinnedChange}
-        />
-      </div>
+      {isAdmin ? (
+        <div className="absolute right-4 top-4 z-10">
+          <SongPinButton
+            songId={song.id}
+            isPinned={song.isPinned}
+            className="rounded-full border border-stone-300 px-3 py-1.5 text-xs font-semibold text-stone-700 transition hover:border-brand-500 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-stone-700 dark:text-stone-200 dark:hover:border-brand-400 dark:hover:text-brand-200"
+            onSuccess={onPinnedChange}
+          />
+        </div>
+      ) : null}
     </article>
   );
 }
