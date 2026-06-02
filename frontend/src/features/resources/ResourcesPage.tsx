@@ -34,6 +34,7 @@ function KindBadge({ kind }: { kind: ResourceKind }) {
 export function ResourcesPage() {
   const { user } = useAuth();
   const [resources, setResources] = useState<Resource[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [activeResource, setActiveResource] = useState<Resource | null>(null);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [draftKind, setDraftKind] = useState<ResourceKind>('text');
@@ -182,6 +183,14 @@ export function ResourcesPage() {
   const activeImageUrl = activeResource?.kind === 'image' ? apiClient.getResourceImageUrl(activeResource.slug) : null;
   const previewPdfUrl = isComposerOpen ? (localFile?.kind === 'pdf' ? localFile.url : null) : activePdfUrl;
   const previewImageUrl = isComposerOpen ? (localFile?.kind === 'image' ? localFile.url : null) : activeImageUrl;
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+  const filteredResources = normalizedSearchQuery
+    ? resources.filter((resource) =>
+        [resource.title, resource.originalFilename ?? '', resource.kind].some((value) =>
+          value.toLowerCase().includes(normalizedSearchQuery)
+        )
+      )
+    : resources;
 
   return (
     <div className="space-y-4 pb-8">
@@ -216,10 +225,22 @@ export function ResourcesPage() {
             ) : null}
           </div>
 
+          <label className="block">
+            <span className="sr-only">Search documents</span>
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search documents"
+              className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition placeholder:text-stone-400 focus:border-brand-500 dark:border-stone-700 dark:bg-stone-950 dark:placeholder:text-stone-500"
+            />
+          </label>
+
           {isLoading ? <p className="text-sm text-stone-500 dark:text-stone-400">Loading documents...</p> : null}
           {!isLoading && resources.length === 0 ? <p className="rounded-2xl border border-dashed border-stone-300 p-4 text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400">No resources have been added yet.</p> : null}
+          {!isLoading && resources.length > 0 && filteredResources.length === 0 ? <p className="rounded-2xl border border-dashed border-stone-300 p-4 text-sm text-stone-500 dark:border-stone-700 dark:text-stone-400">No matching documents.</p> : null}
 
-          {resources.map((resource) => (
+          {filteredResources.map((resource) => (
             <button
               key={resource.id}
               type="button"
@@ -330,7 +351,19 @@ function ResourceViewer({ title, bodyText, pdfUrl, imageUrl }: { title: string; 
   return (
     <article className="rounded-[2rem] border border-stone-200 bg-stone-200/60 p-3 shadow-panel dark:border-stone-800 dark:bg-stone-950">
       {pdfUrl ? (
-        <iframe title={`PDF preview: ${title}`} src={pdfUrl} className="min-h-[720px] w-full rounded-[1.3rem] bg-white" />
+        <>
+          <div className="flex min-h-[280px] flex-col items-center justify-center rounded-[1.3rem] bg-white px-6 py-10 text-center text-stone-950 sm:hidden">
+            <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-red-700">PDF document</span>
+            <h2 className="mt-4 text-xl font-semibold">{title}</h2>
+            <p className="mt-3 max-w-xs text-sm leading-6 text-stone-600">
+              Mobile browsers open PDF files in a separate viewer for clearer reading.
+            </p>
+            <a href={pdfUrl} target="_blank" rel="noreferrer" className="mt-5 rounded-2xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white">
+              Open PDF
+            </a>
+          </div>
+          <iframe title={`PDF preview: ${title}`} src={pdfUrl} className="hidden min-h-[720px] w-full rounded-[1.3rem] bg-white sm:block" />
+        </>
       ) : imageUrl ? (
         <div className="flex min-h-[620px] items-start justify-center rounded-[1.3rem] bg-white p-3">
           <img src={imageUrl} alt={title} className="max-h-[80vh] max-w-full rounded-xl object-contain" />
