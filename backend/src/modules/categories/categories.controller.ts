@@ -6,7 +6,7 @@ import {
   listCategories,
   updateCategory as updateCategoryRecord
 } from './categories.service';
-import { categorySchema } from './categories.schemas';
+import { categoryParamsSchema, categorySchema } from './categories.schemas';
 
 export async function getCategories(_req: Request, res: Response) {
   const categories = await listCategories();
@@ -26,8 +26,9 @@ export async function createCategory(req: Request, res: Response) {
 }
 
 export async function updateCategory(req: Request, res: Response) {
+  const { id } = categoryParamsSchema.parse(req.params);
   const payload = categorySchema.parse(req.body);
-  const category = await updateCategoryRecord(Number(req.params.id), {
+  const category = await updateCategoryRecord(id, {
     name: payload.name,
     slug: payload.slug,
     parentId: payload.parentId ?? null,
@@ -38,6 +39,7 @@ export async function updateCategory(req: Request, res: Response) {
 }
 
 export async function deleteCategory(req: Request, res: Response) {
-  await deleteCategoryRecord(Number(req.params.id));
+  const { id } = categoryParamsSchema.parse(req.params);
+  await deleteCategoryRecord(id);
   res.status(200).json({ message: 'Category deleted' });
 }

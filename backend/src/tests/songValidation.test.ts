@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { loginSchema } from '../modules/auth/auth.schemas';
-import { songPinSchema, songSchema, songSearchSchema, suggestionSchema } from '../modules/songs/songs.schemas';
+import { categoryParamsSchema, categorySchema } from '../modules/categories/categories.schemas';
+import { lineupParamsSchema, lineupSchema } from '../modules/lineups/lineups.schemas';
+import { imageResourceQuerySchema, pdfResourceQuerySchema, resourceParamsSchema, textResourceSchema } from '../modules/resources/resources.schemas';
+import { songParamsSchema, songPinSchema, songSchema, songSearchSchema, suggestionSchema } from '../modules/songs/songs.schemas';
 
 describe('songSchema', () => {
   it('accepts a valid song payload', () => {
@@ -94,5 +97,55 @@ describe('suggestionSchema', () => {
 describe('loginSchema', () => {
   it('rejects invalid emails', () => {
     expect(() => loginSchema.parse({ email: 'bad', password: 'password123' })).toThrow();
+  });
+});
+
+describe('path parameter schemas', () => {
+  it('coerces positive numeric ids', () => {
+    expect(songParamsSchema.parse({ id: '4' }).id).toBe(4);
+    expect(categoryParamsSchema.parse({ id: '5' }).id).toBe(5);
+    expect(lineupParamsSchema.parse({ id: '6' }).id).toBe(6);
+    expect(resourceParamsSchema.parse({ id: '7' }).id).toBe(7);
+  });
+
+  it('rejects malformed ids', () => {
+    expect(() => songParamsSchema.parse({ id: 'not-a-number' })).toThrow();
+    expect(() => categoryParamsSchema.parse({ id: '0' })).toThrow();
+    expect(() => lineupParamsSchema.parse({ id: '-1' })).toThrow();
+    expect(() => resourceParamsSchema.parse({ id: 'not-a-number' })).toThrow();
+  });
+});
+
+describe('categorySchema', () => {
+  it('rejects invalid slugs', () => {
+    expect(() => categorySchema.parse({ name: 'Worship', slug: 'Not Valid', sortOrder: 0 })).toThrow();
+  });
+});
+
+describe('lineupSchema', () => {
+  it('accepts an ordered list of songs', () => {
+    expect(lineupSchema.parse({ title: 'Sunday', songIds: [3, 1, 2] }).songIds).toEqual([3, 1, 2]);
+  });
+
+  it('rejects empty or duplicate song lists', () => {
+    expect(() => lineupSchema.parse({ title: 'Sunday', songIds: [] })).toThrow();
+    expect(() => lineupSchema.parse({ title: 'Sunday', songIds: [1, 1] })).toThrow();
+  });
+});
+
+describe('resource schemas', () => {
+  it('accepts valid pasted text and PDF metadata', () => {
+    expect(textResourceSchema.parse({ title: 'Service Flow', slug: 'service-flow', bodyText: 'Opening prayer' }).slug).toBe(
+      'service-flow'
+    );
+    expect(pdfResourceQuerySchema.parse({ title: 'Checklist', slug: 'checklist', filename: 'checklist.pdf' }).filename).toBe(
+      'checklist.pdf'
+    );
+    expect(imageResourceQuerySchema.parse({ title: 'Poster', slug: 'poster', filename: 'poster.png' }).filename).toBe('poster.png');
+  });
+
+  it('rejects blank pasted text and invalid resource slugs', () => {
+    expect(() => textResourceSchema.parse({ title: 'Blank', slug: 'blank', bodyText: '   ' })).toThrow();
+    expect(() => pdfResourceQuerySchema.parse({ title: 'Bad', slug: 'Bad Slug', filename: 'file.pdf' })).toThrow();
   });
 });

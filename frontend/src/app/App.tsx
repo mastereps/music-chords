@@ -10,6 +10,7 @@ import { LineupPage } from '../features/lineups/LineupPage';
 import { LineupsPage } from '../features/lineups/LineupsPage';
 import { SongEditorPage } from '../features/admin/SongEditorPage';
 import { LoginPage } from '../features/auth/LoginPage';
+import { ResourcesPage } from '../features/resources/ResourcesPage';
 import { SongDetailPage } from '../features/songs/SongDetailPage';
 import { SongsPage } from '../features/songs/SongsPage';
 
@@ -24,6 +25,7 @@ export function App() {
               <Route path="songs/:slug" element={<SongDetailPage />} />
               <Route path="lineups" element={<LineupsPage />} />
               <Route path="lineups/:id" element={<LineupPage />} />
+              <Route path="resources" element={<ResourcesPage />} />
               <Route
                 path="lineups/new"
                 element={

@@ -14,7 +14,14 @@ import {
   setSongPinned,
   updateSong as updateSongRecord
 } from './songs.service';
-import { songPinSchema, songSchema, songSearchSchema, suggestionSchema } from './songs.schemas';
+import {
+  songParamsSchema,
+  songPinSchema,
+  songSchema,
+  songSearchSchema,
+  songSlugParamsSchema,
+  suggestionSchema
+} from './songs.schemas';
 
 function canViewDrafts(req: Request) {
   return req.authRole === 'admin' || req.authRole === 'editor';
@@ -27,7 +34,7 @@ export async function searchSongs(req: Request, res: Response) {
 }
 
 export async function getSong(req: Request, res: Response) {
-  const slug = String(req.params.slug);
+  const { slug } = songSlugParamsSchema.parse(req.params);
   const song = await getSongBySlug(slug, canViewDrafts(req));
   res.status(200).json({ item: assertFound(song, 'Song not found') });
 }
@@ -48,7 +55,8 @@ export async function updateSong(req: Request, res: Response) {
   }
 
   const payload = songSchema.parse(req.body);
-  const song = await updateSongRecord(Number(req.params.id), payload as SongInput, req.authUser);
+  const { id } = songParamsSchema.parse(req.params);
+  const song = await updateSongRecord(id, payload as SongInput, req.authUser);
   res.status(200).json({ item: song });
 }
 
@@ -58,23 +66,27 @@ export async function updateSongPin(req: Request, res: Response) {
   }
 
   const payload = songPinSchema.parse(req.body);
-  const song = await setSongPinned(Number(req.params.id), payload as SongPinInput, req.authUser);
+  const { id } = songParamsSchema.parse(req.params);
+  const song = await setSongPinned(id, payload as SongPinInput, req.authUser);
   res.status(200).json({ item: song });
 }
 
 export async function deleteSong(req: Request, res: Response) {
-  await deleteSongRecord(Number(req.params.id));
+  const { id } = songParamsSchema.parse(req.params);
+  await deleteSongRecord(id);
   res.status(200).json({ message: 'Song deleted' });
 }
 
 export async function suggestSongCorrection(req: Request, res: Response) {
+  const { id } = songParamsSchema.parse(req.params);
   const payload = suggestionSchema.parse(req.body);
-  await createSuggestion(Number(req.params.id), payload, req.authUser);
+  await createSuggestion(id, payload, req.authUser);
   res.status(201).json({ message: 'Suggestion submitted' });
 }
 
 export async function listRevisions(req: Request, res: Response) {
-  const revisions = await getSongRevisions(Number(req.params.id));
+  const { id } = songParamsSchema.parse(req.params);
+  const revisions = await getSongRevisions(id);
   res.status(200).json({ items: revisions });
 }
 

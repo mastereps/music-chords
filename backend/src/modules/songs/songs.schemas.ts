@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+export const songParamsSchema = z.object({
+  id: z.coerce.number().int().positive()
+});
+
+export const songSlugParamsSchema = z.object({
+  slug: z.string().trim().min(1).regex(/^[a-z0-9-]+$/)
+});
+
 export const songSchema = z.object({
   title: z.string().trim().min(1),
   artist: z.string().trim().nullable().optional(),

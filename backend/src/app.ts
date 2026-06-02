@@ -4,6 +4,7 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+import { query } from './config/db';
 import { env } from './config/env';
 import { logger } from './config/logger';
 import { attachAuth } from './middleware/auth';
@@ -39,6 +40,18 @@ export function createApp() {
 
   app.get('/api/health', (_req, res) => {
     res.status(200).json({ status: 'ok' });
+  });
+
+  app.get('/api/ready', async (_req, res) => {
+    try {
+      await query('SELECT 1');
+      res.status(200).json({ status: 'ready' });
+    } catch (error) {
+      logger.error('Readiness check failed', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      res.status(503).json({ status: 'unavailable' });
+    }
   });
 
   app.use('/api', apiRouter);

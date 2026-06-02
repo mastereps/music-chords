@@ -26,7 +26,8 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(12),
   JWT_EXPIRES_IN: z.string().default('7d'),
   SEED_ADMIN_EMAIL: z.string().email().default('admin@example.com'),
-  SEED_ADMIN_PASSWORD: z.string().min(8).default('Admin123!')
+  SEED_ADMIN_PASSWORD: z.string().min(8).default('Admin123!'),
+  RESOURCES_UPLOAD_DIR: z.string().min(1).default(path.resolve(moduleDir, '../../uploads/resources'))
 });
 
 export const env = envSchema.parse(process.env);

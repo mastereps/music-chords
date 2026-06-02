@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { raw, Router } from 'express';
 
 import { login, logout, me } from '../modules/auth/auth.controller';
 import {
@@ -26,6 +26,16 @@ import {
   updateSongPin
 } from '../modules/songs/songs.controller';
 import { createTag, getTags } from '../modules/tags/tags.controller';
+import {
+  createPdfResource,
+  createImageResource,
+  createTextResource,
+  deleteResource,
+  getResource,
+  getResourcePdf,
+  getResourceImage,
+  getResources
+} from '../modules/resources/resources.controller';
 import { requireAuth, requireRole } from '../middleware/auth';
 
 export const apiRouter = Router();
@@ -56,5 +66,20 @@ apiRouter.delete('/categories/:id', requireAuth, requireRole('admin'), deleteCat
 
 apiRouter.get('/tags', getTags);
 apiRouter.post('/tags', requireAuth, requireRole('admin', 'editor'), createTag);
+
+apiRouter.get('/resources', getResources);
+apiRouter.get('/resources/:slug/pdf', getResourcePdf);
+apiRouter.get('/resources/:slug/image', getResourceImage);
+apiRouter.get('/resources/:slug', getResource);
+apiRouter.post('/resources/text', requireAuth, requireRole('admin'), createTextResource);
+apiRouter.post('/resources/pdf', requireAuth, requireRole('admin'), raw({ type: 'application/pdf', limit: '10mb' }), createPdfResource);
+apiRouter.post(
+  '/resources/image',
+  requireAuth,
+  requireRole('admin'),
+  raw({ type: ['image/jpeg', 'image/png', 'image/webp'], limit: '10mb' }),
+  createImageResource
+);
+apiRouter.delete('/resources/:id', requireAuth, requireRole('admin'), deleteResource);
 
 apiRouter.get('/admin/dashboard', requireAuth, requireRole('admin', 'editor'), getAdminDashboard);

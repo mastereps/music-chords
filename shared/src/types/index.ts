@@ -1,6 +1,7 @@
 export type RoleName = 'admin' | 'editor' | 'viewer';
 export type SongStatus = 'draft' | 'published';
 export type SuggestionStatus = 'pending' | 'reviewed' | 'resolved';
+export type ResourceKind = 'pdf' | 'text' | 'image';
 
 export interface AuthUser {
   id: number;
@@ -111,4 +112,22 @@ export interface LineupInput {
   title: string;
   description?: string | null;
   songIds: number[];
+}
+
+export interface Resource {
+  id: number;
+  title: string;
+  slug: string;
+  kind: ResourceKind;
+  bodyText: string | null;
+  originalFilename: string | null;
+  byteSize: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TextResourceInput {
+  title: string;
+  slug: string;
+  bodyText: string;
 }

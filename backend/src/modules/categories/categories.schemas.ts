@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+export const categoryParamsSchema = z.object({
+  id: z.coerce.number().int().positive()
+});
+
 export const categorySchema = z.object({
   name: z.string().trim().min(1),
   slug: z.string().trim().min(1).regex(/^[a-z0-9-]+$/),

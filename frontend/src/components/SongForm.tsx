@@ -108,11 +108,22 @@ export function SongForm({ categories, tags, initialValue, submitLabel, onSubmit
         <label className="space-y-2 sm:col-span-2">
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-semibold">Slug</span>
-            <button type="button" onClick={() => updateField('slug', slugify(form.title))} className="text-xs font-semibold text-brand-700 dark:text-brand-300">
+            <button
+              type="button"
+              aria-label="Generate slug from title"
+              onClick={() => updateField('slug', slugify(form.title))}
+              className="text-xs font-semibold text-brand-700 dark:text-brand-300"
+            >
               Generate from title
             </button>
           </div>
-          <input value={form.slug} onChange={(event) => updateField('slug', event.target.value)} className="w-full rounded-2xl border border-stone-200 px-4 py-3 dark:border-stone-700 dark:bg-stone-950" required />
+          <input
+            aria-label="Slug"
+            value={form.slug}
+            onChange={(event) => updateField('slug', event.target.value)}
+            className="w-full rounded-2xl border border-stone-200 px-4 py-3 dark:border-stone-700 dark:bg-stone-950"
+            required
+          />
         </label>
         <label className="space-y-2">
           <span className="text-sm font-semibold">Category</span>
@@ -165,6 +176,7 @@ export function SongForm({ categories, tags, initialValue, submitLabel, onSubmit
       <label className="space-y-2">
         <span className="text-sm font-semibold">Chord sheet content</span>
         <textarea
+          aria-label="Chord sheet content"
           value={form.content}
           onChange={(event) => updateField('content', event.target.value)}
           rows={16}

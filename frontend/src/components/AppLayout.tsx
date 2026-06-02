@@ -28,6 +28,19 @@ export function AppLayout() {
           </Link>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
             <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `rounded-full border px-3 py-2 text-center text-xs font-semibold transition ${
+                  isActive
+                    ? 'border-brand-500 bg-brand-50 text-brand-700 dark:border-brand-400 dark:bg-brand-900/40 dark:text-brand-100'
+                    : 'border-stone-300 text-stone-700 hover:border-brand-500 hover:text-brand-700 dark:border-stone-700 dark:text-stone-200'
+                }`
+              }
+            >
+              Songs
+            </NavLink>
+            <NavLink
               to="/lineups"
               className={({ isActive }) =>
                 `rounded-full border px-3 py-2 text-center text-xs font-semibold transition ${
@@ -38,6 +51,18 @@ export function AppLayout() {
               }
             >
               Lineups
+            </NavLink>
+            <NavLink
+              to="/resources"
+              className={({ isActive }) =>
+                `rounded-full border px-3 py-2 text-center text-xs font-semibold transition ${
+                  isActive
+                    ? 'border-brand-500 bg-brand-50 text-brand-700 dark:border-brand-400 dark:bg-brand-900/40 dark:text-brand-100'
+                    : 'border-stone-300 text-stone-700 hover:border-brand-500 hover:text-brand-700 dark:border-stone-700 dark:text-stone-200'
+                }`
+              }
+            >
+              Resources
             </NavLink>
             {user?.role && (user.role === 'admin' || user.role === 'editor') ? (
               <NavLink

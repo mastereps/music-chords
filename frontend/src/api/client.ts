@@ -5,6 +5,7 @@ import type {
   LineupInput,
   LineupSummary,
   PaginatedResponse,
+  Resource,
   SongDetail,
   SongInput,
   SongPinInput,
@@ -238,5 +239,55 @@ export const apiClient = {
   async getDashboardStats(signal?: AbortSignal) {
     const data = await request<{ item: DashboardStats }>('/api/admin/dashboard', { signal });
     return data.item;
+  },
+  async getResources(signal?: AbortSignal) {
+    const data = await request<{ items: Resource[] }>('/api/resources', { signal });
+    return data.items;
+  },
+  async createTextResource(input: { title: string; slug: string; bodyText: string }) {
+    const data = await request<{ item: Resource }>('/api/resources/text', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+    return data.item;
+  },
+  async createPdfResource(input: { title: string; slug: string; file: File }) {
+    const query = new URLSearchParams({
+      title: input.title,
+      slug: input.slug,
+      filename: input.file.name
+    });
+    const data = await request<{ item: Resource }>(`/api/resources/pdf?${query.toString()}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/pdf'
+      },
+      body: input.file
+    });
+    return data.item;
+  },
+  async createImageResource(input: { title: string; slug: string; file: File }) {
+    const query = new URLSearchParams({
+      title: input.title,
+      slug: input.slug,
+      filename: input.file.name
+    });
+    const data = await request<{ item: Resource }>(`/api/resources/image?${query.toString()}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': input.file.type
+      },
+      body: input.file
+    });
+    return data.item;
+  },
+  async deleteResource(id: number) {
+    await request(`/api/resources/${id}`, { method: 'DELETE' });
+  },
+  getResourcePdfUrl(slug: string) {
+    return `${API_BASE_URL}/api/resources/${slug}/pdf`;
+  },
+  getResourceImageUrl(slug: string) {
+    return `${API_BASE_URL}/api/resources/${slug}/image`;
   }
 };
