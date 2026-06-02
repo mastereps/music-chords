@@ -3,19 +3,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ResourcesPage } from './ResourcesPage';
 
-const { authState, getResourcePdfUrl, getResources } = vi.hoisted(() => ({
+const { authState, getResourcePdfUrl, getResources, renameResource } = vi.hoisted(() => ({
   authState: {
     user: null as { id: number; email: string; displayName: string; role: 'admin' | 'editor' | 'viewer' } | null
   },
   getResourcePdfUrl: vi.fn(),
-  getResources: vi.fn()
+  getResources: vi.fn(),
+  renameResource: vi.fn()
 }));
 
 vi.mock('../../api/client', () => ({
   apiClient: {
     getResources,
     getResourcePdfUrl,
-    getResourceImageUrl: vi.fn()
+    getResourceImageUrl: vi.fn(),
+    renameResource
   }
 }));
 
@@ -27,6 +29,17 @@ describe('ResourcesPage permissions', () => {
   beforeEach(() => {
     authState.user = null;
     getResourcePdfUrl.mockReturnValue('http://localhost:4000/api/resources/compilation-of-music/pdf');
+    renameResource.mockImplementation(async (id: number, title: string) => ({
+      id,
+      title,
+      slug: 'compilation-of-music',
+      kind: 'pdf',
+      bodyText: null,
+      originalFilename: 'God In Us.pdf',
+      byteSize: 100,
+      createdAt: '2026-06-02T00:00:00.000Z',
+      updatedAt: '2026-06-02T01:00:00.000Z'
+    }));
     getResources.mockResolvedValue([]);
   });
 
@@ -113,5 +126,31 @@ describe('ResourcesPage permissions', () => {
     const openPdf = await screen.findByRole('link', { name: 'Open PDF' });
     expect(openPdf.getAttribute('href')).toBe('http://localhost:4000/api/resources/compilation-of-music/pdf');
     expect(screen.getByTitle('PDF preview: Compilation of Music').className).toContain('sm:block');
+  });
+
+  it('allows admins to rename a selected resource', async () => {
+    authState.user = { id: 1, email: 'admin@example.com', displayName: 'Admin', role: 'admin' };
+    getResources.mockResolvedValue([
+      {
+        id: 2,
+        title: 'Compilation of Music',
+        slug: 'compilation-of-music',
+        kind: 'pdf',
+        bodyText: null,
+        originalFilename: 'God In Us.pdf',
+        byteSize: 100,
+        createdAt: '2026-06-02T00:00:00.000Z',
+        updatedAt: '2026-06-02T00:00:00.000Z'
+      }
+    ]);
+
+    render(<ResourcesPage />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Rename' }));
+    fireEvent.change(screen.getByRole('textbox', { name: 'New document title' }), { target: { value: 'Updated Compilation' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save name' }));
+
+    await waitFor(() => expect(renameResource).toHaveBeenCalledWith(2, 'Updated Compilation'));
+    expect(screen.getAllByText('Updated Compilation').length).toBeGreaterThan(0);
   });
 });

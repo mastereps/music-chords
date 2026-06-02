@@ -194,6 +194,18 @@ export async function getImageResourcePath(slug: string) {
   };
 }
 
+export async function renameResource(id: number, title: string, actor: AuthUser) {
+  const result = await query<ResourceRow>(
+    `UPDATE resources
+     SET title = $2, updated_by = $3
+     WHERE id = $1
+     RETURNING id, title, slug, kind, body_text, stored_filename, original_filename, mime_type, byte_size, created_at::text, updated_at::text`,
+    [id, title, actor.id]
+  );
+
+  return mapResource(assertFound(result.rows[0], 'Resource not found'));
+}
+
 export async function deleteResource(id: number) {
   const result = await query<Pick<ResourceRow, 'stored_filename'>>(
     `DELETE FROM resources

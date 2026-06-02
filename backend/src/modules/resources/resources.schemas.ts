@@ -10,6 +10,10 @@ export const resourceSlugParamsSchema = z.object({
   slug: slugSchema
 });
 
+export const resourceRenameSchema = z.object({
+  title: z.string().trim().min(1).max(255)
+});
+
 export const textResourceSchema = z.object({
   title: z.string().trim().min(1).max(255),
   slug: slugSchema,

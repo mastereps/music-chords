@@ -216,6 +216,14 @@ describeWithDatabase('API integration', () => {
 
     const detailResponse = await request(app).get('/api/resources/sunday-notes').expect(200);
     expect(detailResponse.body.item.bodyText).toBe('Opening prayer\nC   G');
+
+    await editorAgent.patch(`/api/resources/${createResponse.body.item.id}`).send({ title: 'Editor Rename' }).expect(403);
+
+    const renameResponse = await adminAgent
+      .patch(`/api/resources/${createResponse.body.item.id}`)
+      .send({ title: 'Updated Sunday Notes' })
+      .expect(200);
+    expect(renameResponse.body.item).toMatchObject({ title: 'Updated Sunday Notes', slug: 'sunday-notes' });
   });
 
   it('stores admin PDF uploads, streams them publicly, and deletes them', async () => {

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loginSchema } from '../modules/auth/auth.schemas';
 import { categoryParamsSchema, categorySchema } from '../modules/categories/categories.schemas';
 import { lineupParamsSchema, lineupSchema } from '../modules/lineups/lineups.schemas';
-import { imageResourceQuerySchema, pdfResourceQuerySchema, resourceParamsSchema, textResourceSchema } from '../modules/resources/resources.schemas';
+import { imageResourceQuerySchema, pdfResourceQuerySchema, resourceParamsSchema, resourceRenameSchema, textResourceSchema } from '../modules/resources/resources.schemas';
 import { songParamsSchema, songPinSchema, songSchema, songSearchSchema, suggestionSchema } from '../modules/songs/songs.schemas';
 
 describe('songSchema', () => {
@@ -147,5 +147,10 @@ describe('resource schemas', () => {
   it('rejects blank pasted text and invalid resource slugs', () => {
     expect(() => textResourceSchema.parse({ title: 'Blank', slug: 'blank', bodyText: '   ' })).toThrow();
     expect(() => pdfResourceQuerySchema.parse({ title: 'Bad', slug: 'Bad Slug', filename: 'file.pdf' })).toThrow();
+  });
+
+  it('rejects blank resource rename titles', () => {
+    expect(resourceRenameSchema.parse({ title: 'Updated title' }).title).toBe('Updated title');
+    expect(() => resourceRenameSchema.parse({ title: '   ' })).toThrow();
   });
 });

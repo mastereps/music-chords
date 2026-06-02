@@ -92,6 +92,9 @@ Lineups require at least one unique, published song. Song order is preserved.
 | `POST` | `/api/resources/text` | Admin | Publish pasted text |
 | `POST` | `/api/resources/pdf` | Admin | Upload a PDF |
 | `POST` | `/api/resources/image` | Admin | Upload an image |
+| `PATCH` | `/api/resources/:id` | Admin | Rename a document |
 | `DELETE` | `/api/resources/:id` | Admin | Delete a document |
 
 File uploads use a raw request body and the `title`, `slug`, and `filename` query parameters. PDFs use `Content-Type: application/pdf`. Images support `image/jpeg`, `image/png`, and `image/webp`. Uploads are limited to 10 MB. Editors and viewers have read-only resource access.
+
+Renaming changes the display title only. The stable slug and uploaded filename remain unchanged so existing PDF and image URLs continue working.

@@ -12,12 +12,14 @@ import {
   getPdfResourcePath,
   getImageResourcePath,
   getResourceBySlug,
-  listResources
+  listResources,
+  renameResource as renameResourceRecord
 } from './resources.service';
 import {
   imageResourceQuerySchema,
   pdfResourceQuerySchema,
   resourceParamsSchema,
+  resourceRenameSchema,
   resourceSlugParamsSchema,
   textResourceSchema
 } from './resources.schemas';
@@ -88,6 +90,16 @@ export async function createImageResource(req: Request, res: Response) {
   }
 
   res.status(201).json({ item: await createImageResourceRecord(payload, req.body, req.authUser) });
+}
+
+export async function renameResource(req: Request, res: Response) {
+  if (!req.authUser) {
+    throw new AppError('Authentication required', 401);
+  }
+
+  const { id } = resourceParamsSchema.parse(req.params);
+  const { title } = resourceRenameSchema.parse(req.body);
+  res.status(200).json({ item: await renameResourceRecord(id, title, req.authUser) });
 }
 
 export async function deleteResource(req: Request, res: Response) {

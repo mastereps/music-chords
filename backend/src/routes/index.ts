@@ -34,7 +34,8 @@ import {
   getResource,
   getResourcePdf,
   getResourceImage,
-  getResources
+  getResources,
+  renameResource
 } from '../modules/resources/resources.controller';
 import { requireAuth, requireRole } from '../middleware/auth';
 
@@ -80,6 +81,7 @@ apiRouter.post(
   raw({ type: ['image/jpeg', 'image/png', 'image/webp'], limit: '10mb' }),
   createImageResource
 );
+apiRouter.patch('/resources/:id', requireAuth, requireRole('admin'), renameResource);
 apiRouter.delete('/resources/:id', requireAuth, requireRole('admin'), deleteResource);
 
 apiRouter.get('/admin/dashboard', requireAuth, requireRole('admin', 'editor'), getAdminDashboard);

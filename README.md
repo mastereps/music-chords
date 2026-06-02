@@ -127,6 +127,7 @@ Default seeded admin credentials:
 - `POST /api/resources/text` admin only
 - `POST /api/resources/pdf` admin only
 - `POST /api/resources/image` admin only
+- `PATCH /api/resources/:id` admin only
 - `DELETE /api/resources/:id` admin only
 
 ## Role Rules

@@ -45,6 +45,8 @@ export function ResourcesPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [renameTitle, setRenameTitle] = useState('');
   const pdfInputRef = useRef<HTMLInputElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const isAdmin = user?.role === 'admin';
@@ -78,6 +80,7 @@ export function ResourcesPage() {
 
   const resetComposer = () => {
     setIsComposerOpen(false);
+    setIsRenaming(false);
     setDraftKind('text');
     setDraftTitle('');
     setDraftText('');
@@ -172,10 +175,47 @@ export function ResourcesPage() {
       const remainingResources = resources.filter((resource) => resource.id !== activeResource.id);
       setResources(remainingResources);
       setActiveResource(remainingResources[0] ?? null);
+      setIsRenaming(false);
       setNotice('Resource deleted.');
       setError(null);
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : 'Unable to delete resource.');
+    }
+  };
+
+  const startRename = () => {
+    if (!activeResource) {
+      return;
+    }
+
+    setRenameTitle(activeResource.title);
+    setIsRenaming(true);
+    setError(null);
+  };
+
+  const handleRename = async () => {
+    if (!activeResource) {
+      return;
+    }
+
+    const title = renameTitle.trim();
+
+    if (!title) {
+      setError('Document title is required.');
+      return;
+    }
+
+    try {
+      const renamedResource = await apiClient.renameResource(activeResource.id, title);
+      setResources((currentResources) =>
+        currentResources.map((resource) => (resource.id === renamedResource.id ? renamedResource : resource))
+      );
+      setActiveResource(renamedResource);
+      setIsRenaming(false);
+      setNotice('Resource renamed.');
+      setError(null);
+    } catch (renameError) {
+      setError(renameError instanceof Error ? renameError.message : 'Unable to rename resource.');
     }
   };
 
@@ -217,7 +257,14 @@ export function ResourcesPage() {
             {isAdmin ? (
               <button
                 type="button"
-                onClick={() => (isComposerOpen ? resetComposer() : setIsComposerOpen(true))}
+                onClick={() => {
+                  if (isComposerOpen) {
+                    resetComposer();
+                  } else {
+                    setIsRenaming(false);
+                    setIsComposerOpen(true);
+                  }
+                }}
                 className="rounded-full bg-brand-700 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-800"
               >
                 {isComposerOpen ? 'Close draft' : 'Add document'}
@@ -247,6 +294,7 @@ export function ResourcesPage() {
               onClick={() => {
                 setActiveResource(resource);
                 setIsComposerOpen(false);
+                setIsRenaming(false);
                 setNotice(null);
               }}
               className={`w-full rounded-[1.4rem] border p-4 text-left transition ${
@@ -319,7 +367,18 @@ export function ResourcesPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <KindBadge kind={activeResource.kind} />
-                  <h2 className="mt-3 text-2xl font-semibold">{activeResource.title}</h2>
+                  {isRenaming ? (
+                    <label className="mt-3 block">
+                      <span className="sr-only">New document title</span>
+                      <input
+                        value={renameTitle}
+                        onChange={(event) => setRenameTitle(event.target.value)}
+                        className="w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-950 outline-none focus:border-brand-500 dark:border-stone-700 dark:bg-stone-950 dark:text-white"
+                      />
+                    </label>
+                  ) : (
+                    <h2 className="mt-3 text-2xl font-semibold">{activeResource.title}</h2>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {activePdfUrl || activeImageUrl ? (
@@ -328,9 +387,25 @@ export function ResourcesPage() {
                     </a>
                   ) : null}
                   {isAdmin ? (
-                    <button type="button" onClick={() => void handleDelete()} className="rounded-2xl border border-red-300 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-700 dark:text-red-300">
-                      Delete
-                    </button>
+                    <>
+                      {isRenaming ? (
+                        <>
+                          <button type="button" onClick={() => void handleRename()} className="rounded-2xl bg-brand-700 px-4 py-3 text-sm font-semibold text-white">
+                            Save name
+                          </button>
+                          <button type="button" onClick={() => setIsRenaming(false)} className="rounded-2xl border border-stone-300 px-4 py-3 text-sm font-semibold dark:border-stone-700">
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <button type="button" onClick={startRename} className="rounded-2xl border border-stone-300 px-4 py-3 text-sm font-semibold dark:border-stone-700">
+                          Rename
+                        </button>
+                      )}
+                      <button type="button" onClick={() => void handleDelete()} className="rounded-2xl border border-red-300 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-700 dark:text-red-300">
+                        Delete
+                      </button>
+                    </>
                   ) : null}
                 </div>
               </div>

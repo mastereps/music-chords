@@ -281,6 +281,13 @@ export const apiClient = {
     });
     return data.item;
   },
+  async renameResource(id: number, title: string) {
+    const data = await request<{ item: Resource }>(`/api/resources/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ title })
+    });
+    return data.item;
+  },
   async deleteResource(id: number) {
     await request(`/api/resources/${id}`, { method: 'DELETE' });
   },
