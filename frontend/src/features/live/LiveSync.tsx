@@ -9,13 +9,13 @@ const SCROLL_BROADCAST_MS = 200;
 // arriving (closed tab, crash) the server auto-ends the session after ~35s.
 const KEEPALIVE_MS = 10_000;
 
-// Pages behind RequireRole (plus /login) are never broadcast: followers without
-// an account would be redirected to the sign-in page. While the presenter is on
-// one of these, followers simply stay on the last public page.
-const RESTRICTED_PATHS = ['/admin', '/lineups/new', '/login'];
-
-function isRestrictedPath(path: string) {
-  return RESTRICTED_PATHS.some((restricted) => path === restricted || path.startsWith(`${restricted}/`));
+// Only song pages are ever broadcast to followers. While the presenter browses
+// anywhere else (song list, lineups, resources, admin pages) followers stay on
+// whatever song they were left on — nothing moves until the presenter opens
+// the next song. This also keeps followers away from admin-only pages, which
+// would redirect signed-out visitors to the login screen.
+function isSongPath(path: string) {
+  return /^\/songs\/[^/]+$/.test(path);
 }
 
 function getScrollPct() {
@@ -43,20 +43,22 @@ export function LiveSync() {
 
     let lastSentAt = 0;
     let pendingTimer: number | null = null;
-    const restricted = isRestrictedPath(location.pathname);
+    const shareable = isSongPath(location.pathname);
 
     const send = () => {
       lastSentAt = Date.now();
       void apiClient
         .updateLiveState(
-          restricted
-            ? { active: true }
-            : {
+          shareable
+            ? {
                 active: true,
                 path: location.pathname,
                 scrollPct: getScrollPct(),
                 songView
               }
+            : // A null songView tells followers the presenter is not on a song
+              // right now, so they are free until the next song opens.
+              { active: true, songView: null }
         )
         .catch(() => {
           // Keep presenting even if a single broadcast fails.
@@ -82,7 +84,7 @@ export function LiveSync() {
     send();
     const keepaliveTimer = window.setInterval(send, KEEPALIVE_MS);
 
-    if (!restricted) {
+    if (shareable) {
       window.addEventListener('scroll', sendThrottled, { passive: true });
     }
 
@@ -97,11 +99,14 @@ export function LiveSync() {
 
   // Follower: mirror the presenter's page and scroll position.
   const shouldFollow = Boolean(liveState?.active) && !isPresenting && isFollowing;
+  const presenterOnSong = Boolean(liveState?.songView);
   const targetPath = liveState?.path ?? '/';
   const targetScrollPct = liveState?.scrollPct ?? 0;
 
   useEffect(() => {
-    if (!shouldFollow || isRestrictedPath(targetPath)) {
+    // Followers are only driven while the presenter is inside a song page;
+    // whenever the presenter is anywhere else they stay free where they are.
+    if (!shouldFollow || !presenterOnSong || !isSongPath(targetPath)) {
       return;
     }
 
@@ -115,7 +120,7 @@ export function LiveSync() {
     // Content (song sheets, lists) may still be loading; re-apply once it settles.
     const retryTimer = window.setTimeout(() => applyScrollPct(targetScrollPct), 350);
     return () => window.clearTimeout(retryTimer);
-  }, [shouldFollow, targetPath, targetScrollPct, location.pathname, navigate]);
+  }, [shouldFollow, presenterOnSong, targetPath, targetScrollPct, location.pathname, navigate]);
 
   return null;
 }
