@@ -1,7 +1,13 @@
 import type { Response } from 'express';
 import { describe, expect, it } from 'vitest';
 
-import { addLiveClient, getLiveState, removeLiveClient, updateLiveState } from '../modules/live/live.service';
+import {
+  addLiveClient,
+  expireIfPresenterGone,
+  getLiveState,
+  removeLiveClient,
+  updateLiveState
+} from '../modules/live/live.service';
 
 function createFakeClient() {
   const messages: string[] = [];
@@ -46,5 +52,23 @@ describe('live service', () => {
     const ended = updateLiveState({ active: false, songView: null });
     expect(ended.active).toBe(false);
     expect(ended.songView).toBeNull();
+  });
+
+  it('auto-ends the session when the presenter stops pinging', () => {
+    updateLiveState({ active: true, path: '/', scrollPct: 0 });
+
+    // Presenter still fresh: session stays live.
+    expireIfPresenterGone(Date.now() + 5_000);
+    expect(getLiveState().active).toBe(true);
+
+    // No ping for longer than the timeout: session ends and is broadcast.
+    const { res, messages } = createFakeClient();
+    addLiveClient(res);
+    expireIfPresenterGone(Date.now() + 60_000);
+    removeLiveClient(res);
+
+    expect(getLiveState().active).toBe(false);
+    const lastEvent = JSON.parse(messages[messages.length - 1].replace(/^data: /, ''));
+    expect(lastEvent.active).toBe(false);
   });
 });

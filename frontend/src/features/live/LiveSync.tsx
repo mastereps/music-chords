@@ -5,6 +5,9 @@ import { apiClient } from '../../api/client';
 import { useLive } from './LiveProvider';
 
 const SCROLL_BROADCAST_MS = 200;
+// Keepalive so the server knows the presenter is still here; if these stop
+// arriving (closed tab, crash) the server auto-ends the session after ~35s.
+const KEEPALIVE_MS = 10_000;
 
 // Pages behind RequireRole (plus /login) are never broadcast: followers without
 // an account would be redirected to the sign-in page. While the presenter is on
@@ -77,6 +80,7 @@ export function LiveSync() {
     };
 
     send();
+    const keepaliveTimer = window.setInterval(send, KEEPALIVE_MS);
 
     if (!restricted) {
       window.addEventListener('scroll', sendThrottled, { passive: true });
@@ -84,6 +88,7 @@ export function LiveSync() {
 
     return () => {
       window.removeEventListener('scroll', sendThrottled);
+      window.clearInterval(keepaliveTimer);
       if (pendingTimer !== null) {
         window.clearTimeout(pendingTimer);
       }
