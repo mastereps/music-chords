@@ -6,6 +6,15 @@ import { useLive } from './LiveProvider';
 
 const SCROLL_BROADCAST_MS = 200;
 
+// Pages behind RequireRole (plus /login) are never broadcast: followers without
+// an account would be redirected to the sign-in page. While the presenter is on
+// one of these, followers simply stay on the last public page.
+const RESTRICTED_PATHS = ['/admin', '/lineups/new', '/login'];
+
+function isRestrictedPath(path: string) {
+  return RESTRICTED_PATHS.some((restricted) => path === restricted || path.startsWith(`${restricted}/`));
+}
+
 function getScrollPct() {
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   return maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
@@ -31,16 +40,21 @@ export function LiveSync() {
 
     let lastSentAt = 0;
     let pendingTimer: number | null = null;
+    const restricted = isRestrictedPath(location.pathname);
 
     const send = () => {
       lastSentAt = Date.now();
       void apiClient
-        .updateLiveState({
-          active: true,
-          path: location.pathname,
-          scrollPct: getScrollPct(),
-          songView
-        })
+        .updateLiveState(
+          restricted
+            ? { active: true }
+            : {
+                active: true,
+                path: location.pathname,
+                scrollPct: getScrollPct(),
+                songView
+              }
+        )
         .catch(() => {
           // Keep presenting even if a single broadcast fails.
         });
@@ -63,7 +77,10 @@ export function LiveSync() {
     };
 
     send();
-    window.addEventListener('scroll', sendThrottled, { passive: true });
+
+    if (!restricted) {
+      window.addEventListener('scroll', sendThrottled, { passive: true });
+    }
 
     return () => {
       window.removeEventListener('scroll', sendThrottled);
@@ -79,7 +96,7 @@ export function LiveSync() {
   const targetScrollPct = liveState?.scrollPct ?? 0;
 
   useEffect(() => {
-    if (!shouldFollow) {
+    if (!shouldFollow || isRestrictedPath(targetPath)) {
       return;
     }
 

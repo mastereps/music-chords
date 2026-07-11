@@ -2,15 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { transposeChordToken, transposeContent } from '@music-chords/shared';
-import type { SongDetail, SongRevision } from '@music-chords/shared';
+import type { SongDetail } from '@music-chords/shared';
 
 import { useAuth } from '../../app/AuthProvider';
 import { apiClient } from '../../api/client';
 import { ChordSheet } from '../../components/ChordSheet';
 import { FontSizeControls } from '../../components/FontSizeControls';
-import { RevisionList } from '../../components/RevisionList';
 import { SongPinButton } from '../../components/SongPinButton';
-import { SuggestionForm } from '../../components/SuggestionForm';
 import { TransposeControls } from '../../components/TransposeControls';
 import { ActiveLineupFab } from '../lineups/ActiveLineupFab';
 import { useLive } from '../live/LiveProvider';
@@ -20,7 +18,6 @@ export function SongDetailPage() {
   const { slug = '' } = useParams();
   const { user } = useAuth();
   const [song, setSong] = useState<SongDetail | null>(null);
-  const [revisions, setRevisions] = useState<SongRevision[]>([]);
   const [offset, setOffset] = useState(0);
   const [fontSize, setFontSize] = useState(17);
   const [error, setError] = useState<string | null>(null);
@@ -76,17 +73,6 @@ export function SongDetailPage() {
     return () => controller.abort();
   }, [slug]);
 
-  useEffect(() => {
-    if (!song?.id || !isEditor) {
-      setRevisions([]);
-      return;
-    }
-
-    const controller = new AbortController();
-    void apiClient.getRevisions(song.id, controller.signal).then(setRevisions).catch(() => setRevisions([]));
-    return () => controller.abort();
-  }, [isEditor, song?.id]);
-
   const displayedContent = useMemo(() => (song ? transposeContent(song.content, offset) : ''), [song, offset]);
   const displayedKey = useMemo(() => (song ? transposeChordToken(song.key, offset) : ''), [song, offset]);
 
@@ -99,7 +85,7 @@ export function SongDetailPage() {
   }
 
   return (
-    <div className="grid gap-4 pb-24 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="pb-24">
       <section className="space-y-4">
         <div className="rounded-[2rem] border border-stone-200 bg-white p-5  dark:border-stone-800 dark:bg-stone-900">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -148,14 +134,6 @@ export function SongDetailPage() {
 
         <ChordSheet content={displayedContent} fontSize={fontSize} />
       </section>
-
-      <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-        {isEditor ? (
-          <RevisionList items={revisions} />
-        ) : (
-          <SuggestionForm onSubmit={(input) => apiClient.suggestCorrection(song.id, input)} />
-        )}
-      </aside>
 
       <ActiveLineupFab currentSongSlug={song.slug} />
     </div>
