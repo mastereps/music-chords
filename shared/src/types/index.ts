@@ -131,3 +131,23 @@ export interface TextResourceInput {
   slug: string;
   bodyText: string;
 }
+
+export interface LiveSongView {
+  offset: number;
+  fontSize: number;
+}
+
+export interface LiveState {
+  active: boolean;
+  path: string;
+  scrollPct: number;
+  songView: LiveSongView | null;
+  updatedAt: string;
+}
+
+export interface LiveStateInput {
+  active: boolean;
+  path?: string;
+  scrollPct?: number;
+  songView?: LiveSongView | null;
+}

@@ -272,6 +272,28 @@ describeWithDatabase('API integration', () => {
     await editorAgent.delete(`/api/resources/${createResponse.body.item.id}`).expect(403);
   });
 
+  it('lets only admins broadcast live state', async () => {
+    await request(app).post('/api/live/state').send({ active: true }).expect(401);
+    await viewerAgent.post('/api/live/state').send({ active: true }).expect(403);
+    await editorAgent.post('/api/live/state').send({ active: true }).expect(403);
+
+    const response = await adminAgent
+      .post('/api/live/state')
+      .send({ active: true, path: '/songs/alpha-song', scrollPct: 0.5, songView: { offset: 2, fontSize: 19 } })
+      .expect(200);
+    expect(response.body.item).toMatchObject({
+      active: true,
+      path: '/songs/alpha-song',
+      scrollPct: 0.5,
+      songView: { offset: 2, fontSize: 19 }
+    });
+
+    await adminAgent.post('/api/live/state').send({ active: true, scrollPct: 2 }).expect(400);
+
+    const endResponse = await adminAgent.post('/api/live/state').send({ active: false }).expect(200);
+    expect(endResponse.body.item.active).toBe(false);
+  });
+
   it('rejects files that do not have a supported image signature', async () => {
     await adminAgent
       .post('/api/resources/image?title=Invalid&slug=invalid-image&filename=invalid.png')

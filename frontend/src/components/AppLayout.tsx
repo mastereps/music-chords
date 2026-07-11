@@ -3,9 +3,14 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '../app/AuthProvider';
+import { FollowPill } from '../features/live/FollowPill';
+import { LiveSync } from '../features/live/LiveSync';
+import { useLive } from '../features/live/LiveProvider';
 
 export function AppLayout() {
   const { user, logout } = useAuth();
+  const { liveState, canPresent, startPresenting, stopPresenting } = useLive();
+  const isLive = Boolean(liveState?.active);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const stored = window.localStorage.getItem('theme');
     return stored === 'light' ? 'light' : 'dark';
@@ -72,6 +77,20 @@ export function AppLayout() {
                 Admin
               </NavLink>
             ) : null}
+            {canPresent ? (
+              <button
+                type="button"
+                onClick={() => (isLive ? void stopPresenting() : startPresenting())}
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-2 text-center text-xs font-semibold transition ${
+                  isLive
+                    ? 'border-red-500 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-500/60 dark:bg-red-900/30 dark:text-red-200'
+                    : 'border-stone-300 text-stone-700 hover:border-red-500 hover:text-red-600 dark:border-stone-700 dark:text-stone-200'
+                }`}
+              >
+                <span className={`h-2 w-2 rounded-full ${isLive ? 'animate-pulse bg-red-500' : 'bg-stone-400 dark:bg-stone-500'}`} />
+                {isLive ? 'End Live' : 'Go Live'}
+              </button>
+            ) : null}
             <ThemeToggle theme={theme} onToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
             {user ? (
               <button
@@ -95,6 +114,8 @@ export function AppLayout() {
       <main className="mx-auto w-full max-w-6xl min-w-0 px-4 py-4 sm:py-6">
         <Outlet />
       </main>
+      <LiveSync />
+      <FollowPill />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { SongPinButton } from '../../components/SongPinButton';
 import { SuggestionForm } from '../../components/SuggestionForm';
 import { TransposeControls } from '../../components/TransposeControls';
 import { ActiveLineupFab } from '../lineups/ActiveLineupFab';
+import { useLive } from '../live/LiveProvider';
 import { formatDate } from '../../utils/date';
 
 export function SongDetailPage() {
@@ -26,6 +27,31 @@ export function SongDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const isEditor = user?.role === 'admin' || user?.role === 'editor';
   const isAdmin = user?.role === 'admin';
+  const { liveState, isPresenting, isFollowing, reportSongView } = useLive();
+
+  // Presenter: publish the current transpose offset and font size while live.
+  useEffect(() => {
+    if (!isPresenting) {
+      return;
+    }
+
+    reportSongView({ offset, fontSize });
+  }, [isPresenting, offset, fontSize, reportSongView]);
+
+  useEffect(() => () => reportSongView(null), [reportSongView]);
+
+  // Follower: mirror the presenter's transpose offset and font size.
+  const liveSongView = liveState?.songView;
+  const followsSongView = Boolean(liveState?.active) && !isPresenting && isFollowing;
+
+  useEffect(() => {
+    if (!followsSongView || !liveSongView) {
+      return;
+    }
+
+    setOffset(liveSongView.offset);
+    setFontSize(liveSongView.fontSize);
+  }, [followsSongView, liveSongView]);
 
   useEffect(() => {
     const controller = new AbortController();

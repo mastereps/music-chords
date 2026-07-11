@@ -37,6 +37,7 @@ import {
   getResources,
   renameResource
 } from '../modules/resources/resources.controller';
+import { streamLive, updateLiveState } from '../modules/live/live.controller';
 import { requireAuth, requireRole } from '../middleware/auth';
 
 export const apiRouter = Router();
@@ -83,5 +84,8 @@ apiRouter.post(
 );
 apiRouter.patch('/resources/:id', requireAuth, requireRole('admin'), renameResource);
 apiRouter.delete('/resources/:id', requireAuth, requireRole('admin'), deleteResource);
+
+apiRouter.get('/live/stream', streamLive);
+apiRouter.post('/live/state', requireAuth, requireRole('admin'), updateLiveState);
 
 apiRouter.get('/admin/dashboard', requireAuth, requireRole('admin', 'editor'), getAdminDashboard);

@@ -4,6 +4,8 @@ import type {
   LineupDetail,
   LineupInput,
   LineupSummary,
+  LiveState,
+  LiveStateInput,
   PaginatedResponse,
   Resource,
   SongDetail,
@@ -290,6 +292,16 @@ export const apiClient = {
   },
   async deleteResource(id: number) {
     await request(`/api/resources/${id}`, { method: 'DELETE' });
+  },
+  async updateLiveState(input: LiveStateInput) {
+    const data = await request<{ item: LiveState }>('/api/live/state', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+    return data.item;
+  },
+  getLiveStreamUrl() {
+    return `${API_BASE_URL}/api/live/stream`;
   },
   getResourcePdfUrl(slug: string) {
     return `${API_BASE_URL}/api/resources/${slug}/pdf`;
