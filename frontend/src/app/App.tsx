@@ -14,6 +14,11 @@ import { LoginPage } from '../features/auth/LoginPage';
 import { ResourcesPage } from '../features/resources/ResourcesPage';
 import { SongDetailPage } from '../features/songs/SongDetailPage';
 import { SongsPage } from '../features/songs/SongsPage';
+import { StudentDetailPage } from '../features/tracker/StudentDetailPage';
+import { TrackerDashboardPage } from '../features/tracker/TrackerDashboardPage';
+import { TrackerLayout } from '../features/tracker/TrackerLayout';
+import { TrackerProvider } from '../features/tracker/TrackerProvider';
+import { TrackerStudentsPage } from '../features/tracker/TrackerStudentsPage';
 
 export function App() {
   return (
@@ -22,6 +27,18 @@ export function App() {
         <LineupProvider>
           <BrowserRouter>
             <Routes>
+              <Route
+                path="tracker"
+                element={
+                  <TrackerProvider>
+                    <TrackerLayout />
+                  </TrackerProvider>
+                }
+              >
+                <Route index element={<TrackerDashboardPage />} />
+                <Route path="students" element={<TrackerStudentsPage />} />
+                <Route path="students/:studentId" element={<StudentDetailPage />} />
+              </Route>
               <Route element={<AppLayout />}>
                 <Route index element={<SongsPage />} />
                 <Route path="songs/:slug" element={<SongDetailPage />} />
