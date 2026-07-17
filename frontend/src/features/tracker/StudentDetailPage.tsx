@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { ChecklistRow } from './components/ChecklistRow';
 import { GroupHeader } from './components/GroupHeader';
@@ -7,6 +7,7 @@ import { ProgressBar } from './components/ProgressBar';
 import { ROW_GRID } from './components/rowGrid';
 import { StudentAvatar } from './components/StudentAvatar';
 import { AddItemModal } from './components/AddItemModal';
+import { StudentActionsMenu } from './components/StudentActionsMenu';
 import { instrumentStyle } from './instruments';
 import { studentProgress } from './progress';
 import { studentReviewDueCount } from './review';
@@ -16,10 +17,12 @@ import { DeleteModal } from '../../components/DeleteModal';
 
 export function StudentDetailPage() {
   const { studentId } = useParams();
-  const { students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview } = useTracker();
+  const { students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, deleteStudent } = useTracker();
+  const navigate = useNavigate();
   const [activeChecklistId, setActiveChecklistId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [isDeletingStudent, setIsDeletingStudent] = useState(false);
 
   const student = students.find((candidate) => candidate.id === studentId);
 
@@ -38,6 +41,7 @@ export function StudentDetailPage() {
   const style = instrumentStyle(student.instrument);
   const overall = studentProgress(student);
   const reviewDue = studentReviewDueCount(student);
+  const totalItems = student.checklists.reduce((count, list) => count + list.items.length, 0);
   const pendingDeleteItem = checklist.items.find((item) => item.id === pendingDeleteId) ?? null;
 
   return (
@@ -46,13 +50,16 @@ export function StudentDetailPage() {
         <Link to="/tracker" className="text-sm font-semibold text-studio-accent transition hover:opacity-80">
           ← Back to Dashboard
         </Link>
-        <button
-          type="button"
-          onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-2 rounded-full bg-studio-accent px-4 py-2.5 text-sm font-semibold text-white shadow-panel transition hover:bg-studio-accent/90"
-        >
-          <span aria-hidden="true">+</span> Add Item
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsAddOpen(true)}
+            className="flex items-center gap-2 rounded-full bg-studio-accent px-4 py-2.5 text-sm font-semibold text-white shadow-panel transition hover:bg-studio-accent/90"
+          >
+            <span aria-hidden="true">+</span> Add Item
+          </button>
+          <StudentActionsMenu studentName={student.name} onDelete={() => setIsDeletingStudent(true)} />
+        </div>
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-6">
@@ -173,6 +180,18 @@ export function StudentDetailPage() {
           setPendingDeleteId(null);
         }}
         onCancel={() => setPendingDeleteId(null)}
+      />
+
+      <DeleteModal
+        isOpen={isDeletingStudent}
+        title={`Delete ${student.name}?`}
+        message={`This removes ${student.name} and all ${totalItems} ${totalItems === 1 ? 'item' : 'items'} across their ${student.checklists.length} checklists, including every note and attempt. This action cannot be undone.`}
+        onConfirm={async () => {
+          setIsDeletingStudent(false);
+          deleteStudent(student.id);
+          navigate('/tracker');
+        }}
+        onCancel={() => setIsDeletingStudent(false)}
       />
     </div>
   );

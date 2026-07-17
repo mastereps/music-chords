@@ -29,6 +29,8 @@ interface TrackerContextValue {
   confirmReview: (studentId: string, checklistId: string, itemId: string) => void;
   /** Returns the new student's id so the caller can navigate straight to them. */
   addStudent: (draft: NewStudentDraft) => string | null;
+  /** Removes a student and everything on their checklists. */
+  deleteStudent: (studentId: string) => void;
 }
 
 const TrackerContext = createContext<TrackerContextValue | null>(null);
@@ -155,9 +157,13 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     return id;
   }, []);
 
+  const deleteStudent = useCallback((studentId: string) => {
+    setStudents((current) => current.filter((student) => student.id !== studentId));
+  }, []);
+
   const value = useMemo(
-    () => ({ students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, addStudent }),
-    [students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, addStudent]
+    () => ({ students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, addStudent, deleteStudent }),
+    [students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, addStudent, deleteStudent]
   );
 
   return <TrackerContext.Provider value={value}>{children}</TrackerContext.Provider>;
