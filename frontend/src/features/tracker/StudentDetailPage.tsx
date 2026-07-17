@@ -8,6 +8,7 @@ import { ROW_GRID } from './components/rowGrid';
 import { StudentAvatar } from './components/StudentAvatar';
 import { AddItemModal } from './components/AddItemModal';
 import { StudentActionsMenu } from './components/StudentActionsMenu';
+import { StudentFormModal } from './components/StudentFormModal';
 import { instrumentStyle } from './instruments';
 import { studentProgress } from './progress';
 import { studentReviewDueCount } from './review';
@@ -17,12 +18,13 @@ import { DeleteModal } from '../../components/DeleteModal';
 
 export function StudentDetailPage() {
   const { studentId } = useParams();
-  const { students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, deleteStudent } = useTracker();
+  const { students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, updateStudent, deleteStudent } = useTracker();
   const navigate = useNavigate();
   const [activeChecklistId, setActiveChecklistId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [isDeletingStudent, setIsDeletingStudent] = useState(false);
+  const [isEditingStudent, setIsEditingStudent] = useState(false);
 
   const student = students.find((candidate) => candidate.id === studentId);
 
@@ -58,7 +60,11 @@ export function StudentDetailPage() {
           >
             <span aria-hidden="true">+</span> Add Item
           </button>
-          <StudentActionsMenu studentName={student.name} onDelete={() => setIsDeletingStudent(true)} />
+          <StudentActionsMenu
+            studentName={student.name}
+            onEdit={() => setIsEditingStudent(true)}
+            onDelete={() => setIsDeletingStudent(true)}
+          />
         </div>
       </div>
 
@@ -181,6 +187,19 @@ export function StudentDetailPage() {
         }}
         onCancel={() => setPendingDeleteId(null)}
       />
+
+      {isEditingStudent ? (
+        <StudentFormModal
+          mode="edit"
+          initialName={student.name}
+          initialInstrument={student.instrument}
+          onSubmit={(draft) => {
+            updateStudent(student.id, draft);
+            setIsEditingStudent(false);
+          }}
+          onCancel={() => setIsEditingStudent(false)}
+        />
+      ) : null}
 
       <DeleteModal
         isOpen={isDeletingStudent}

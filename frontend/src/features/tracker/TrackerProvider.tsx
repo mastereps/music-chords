@@ -29,6 +29,8 @@ interface TrackerContextValue {
   confirmReview: (studentId: string, checklistId: string, itemId: string) => void;
   /** Returns the new student's id so the caller can navigate straight to them. */
   addStudent: (draft: NewStudentDraft) => string | null;
+  /** Renames a student or changes their instrument. Checklists are left untouched. */
+  updateStudent: (studentId: string, draft: NewStudentDraft) => void;
   /** Removes a student and everything on their checklists. */
   deleteStudent: (studentId: string) => void;
 }
@@ -157,13 +159,29 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     return id;
   }, []);
 
+  const updateStudent = useCallback((studentId: string, draft: NewStudentDraft) => {
+    const name = draft.name.trim();
+    if (name === '') {
+      return;
+    }
+
+    setStudents((current) =>
+      current.map((student) =>
+        student.id !== studentId
+          ? student
+          : // Initials are derived from the name, so a rename has to re-derive them.
+            { ...student, name, instrument: draft.instrument, avatarInitials: initialsFor(name) }
+      )
+    );
+  }, []);
+
   const deleteStudent = useCallback((studentId: string) => {
     setStudents((current) => current.filter((student) => student.id !== studentId));
   }, []);
 
   const value = useMemo(
-    () => ({ students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, addStudent, deleteStudent }),
-    [students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, addStudent, deleteStudent]
+    () => ({ students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, addStudent, updateStudent, deleteStudent }),
+    [students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, addStudent, updateStudent, deleteStudent]
   );
 
   return <TrackerContext.Provider value={value}>{children}</TrackerContext.Provider>;

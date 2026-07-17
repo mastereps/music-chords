@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { AddStudentModal } from './components/AddStudentModal';
 import { StudentCard } from './components/StudentCard';
+import { StudentFormModal } from './components/StudentFormModal';
 import { useTracker } from './TrackerProvider';
 
 /** Decorative staff-and-notes flourish behind the page header. */
@@ -57,17 +57,19 @@ export function TrackerDashboardPage() {
         ))}
       </div>
 
-      <AddStudentModal
-        isOpen={isAddOpen}
-        onAdd={(draft) => {
-          const id = addStudent(draft);
-          setIsAddOpen(false);
-          if (id) {
-            navigate(`/tracker/students/${id}`);
-          }
-        }}
-        onCancel={() => setIsAddOpen(false)}
-      />
+      {isAddOpen ? (
+        <StudentFormModal
+          mode="add"
+          onSubmit={(draft) => {
+            const id = addStudent(draft);
+            setIsAddOpen(false);
+            if (id) {
+              navigate(`/tracker/students/${id}`);
+            }
+          }}
+          onCancel={() => setIsAddOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

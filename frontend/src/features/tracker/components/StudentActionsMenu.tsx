@@ -2,11 +2,12 @@ import { useState } from 'react';
 
 interface StudentActionsMenuProps {
   studentName: string;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
 /** The "⋮" overflow menu from the reference, next to Add Item. Destructive actions live here. */
-export function StudentActionsMenu({ studentName, onDelete }: StudentActionsMenuProps) {
+export function StudentActionsMenu({ studentName, onEdit, onDelete }: StudentActionsMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -31,6 +32,21 @@ export function StudentActionsMenu({ studentName, onDelete }: StudentActionsMenu
           {/* Catches outside clicks so the menu closes like a native one. */}
           <button type="button" aria-hidden="true" tabIndex={-1} onClick={() => setIsOpen(false)} className="fixed inset-0 z-30 cursor-default" />
           <div role="menu" className="absolute right-0 z-40 mt-2 w-52 overflow-hidden rounded-xl border border-studio-line bg-studio-card py-1 shadow-panel">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setIsOpen(false);
+                onEdit();
+              }}
+              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-studio-ink transition hover:bg-studio-page"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 20h4l10-10a2.8 2.8 0 0 0-4-4L4 16v4z" />
+              </svg>
+              Edit name & instrument
+            </button>
+            <div className="my-1 border-t border-studio-line" />
             <button
               type="button"
               role="menuitem"
