@@ -4,6 +4,7 @@ interface StatusSelectProps {
   value: ItemStatus;
   onChange: (status: ItemStatus) => void;
   label: string;
+  disabled?: boolean;
 }
 
 const STATUS_CLASSES: Record<ItemStatus, string> = {
@@ -12,14 +13,17 @@ const STATUS_CLASSES: Record<ItemStatus, string> = {
   not_started: 'bg-status-not-started-soft text-status-not-started ring-status-not-started/20'
 };
 
-export function StatusSelect({ value, onChange, label }: StatusSelectProps) {
+export function StatusSelect({ value, onChange, label, disabled = false }: StatusSelectProps) {
   return (
     <div className={`relative inline-flex items-center rounded-lg ring-1 ${STATUS_CLASSES[value]}`}>
       <select
         aria-label={label}
         value={value}
+        disabled={disabled}
         onChange={(event) => onChange(event.target.value as ItemStatus)}
-        className="cursor-pointer appearance-none bg-transparent py-1.5 pl-3 pr-8 text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-studio-accent/60"
+        className={`appearance-none bg-transparent py-1.5 pl-3 pr-8 text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-studio-accent/60 ${
+          disabled ? 'cursor-default' : 'cursor-pointer'
+        }`}
       >
         {ITEM_STATUSES.map((status) => (
           <option key={status} value={status} className="bg-white text-studio-ink">

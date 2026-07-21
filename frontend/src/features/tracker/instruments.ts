@@ -38,6 +38,18 @@ export type Instrument = keyof typeof INSTRUMENT_STYLES;
 /** Every instrument, in registry order — drives the Add Student dropdown. */
 export const INSTRUMENTS = Object.keys(INSTRUMENT_STYLES) as Instrument[];
 
+/** Fallback for instruments stored before they were removed from the registry — neutral, never a crash. */
+const UNKNOWN_INSTRUMENT_STYLE: InstrumentStyle = { badge: '🎵', color: '#7A6A55', tint: '#EFE8DA' };
+
 export function instrumentStyle(instrument: Instrument): InstrumentStyle {
-  return INSTRUMENT_STYLES[instrument];
+  return INSTRUMENT_STYLES[instrument] ?? UNKNOWN_INSTRUMENT_STYLE;
+}
+
+/**
+ * Narrows a stored instrument name to the registry. The backend stores instruments as plain
+ * strings so this registry stays the only place they are declared, which means a row can
+ * outlive its entry — such a student still renders, just with the neutral fallback style.
+ */
+export function toInstrument(value: string): Instrument {
+  return value as Instrument;
 }

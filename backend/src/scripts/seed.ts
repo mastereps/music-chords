@@ -1,6 +1,7 @@
 import { query, pool } from '../config/db';
 import { env } from '../config/env';
 import { logger } from '../config/logger';
+import { seedTracker } from './seedTracker';
 import { hashPassword } from '../utils/security';
 
 interface SeedSong {
@@ -178,6 +179,8 @@ async function seed() {
       }
     }
   }
+
+  await seedTracker();
 
   logger.info('Seed completed', { email: env.SEED_ADMIN_EMAIL });
 }

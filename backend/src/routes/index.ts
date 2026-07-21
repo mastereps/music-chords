@@ -37,6 +37,15 @@ import {
   getResources,
   renameResource
 } from '../modules/resources/resources.controller';
+import {
+  createTrackerItem,
+  createTrackerStudent,
+  deleteTrackerItem,
+  deleteTrackerStudent,
+  getTrackerStudents,
+  updateTrackerItem,
+  updateTrackerStudent
+} from '../modules/tracker/tracker.controller';
 import { streamLive, updateLiveState } from '../modules/live/live.controller';
 import { requireAuth, requireRole } from '../middleware/auth';
 
@@ -84,6 +93,15 @@ apiRouter.post(
 );
 apiRouter.patch('/resources/:id', requireAuth, requireRole('admin'), renameResource);
 apiRouter.delete('/resources/:id', requireAuth, requireRole('admin'), deleteResource);
+
+// Reading the tracker is public; every write is admin-only. Editors are viewers here, unlike songs.
+apiRouter.get('/tracker/students', getTrackerStudents);
+apiRouter.post('/tracker/students', requireAuth, requireRole('admin'), createTrackerStudent);
+apiRouter.patch('/tracker/students/:id', requireAuth, requireRole('admin'), updateTrackerStudent);
+apiRouter.delete('/tracker/students/:id', requireAuth, requireRole('admin'), deleteTrackerStudent);
+apiRouter.post('/tracker/checklists/:id/items', requireAuth, requireRole('admin'), createTrackerItem);
+apiRouter.patch('/tracker/items/:id', requireAuth, requireRole('admin'), updateTrackerItem);
+apiRouter.delete('/tracker/items/:id', requireAuth, requireRole('admin'), deleteTrackerItem);
 
 apiRouter.get('/live/stream', streamLive);
 apiRouter.post('/live/state', requireAuth, requireRole('admin'), updateLiveState);

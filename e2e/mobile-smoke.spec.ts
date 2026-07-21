@@ -16,6 +16,9 @@ test('admin can log in and open the dashboard', async ({ page }) => {
   await page.getByLabel('Password').fill('Admin123!');
   await page.getByRole('button', { name: 'Sign in' }).click();
 
-  await page.goto('/admin');
+  // On success the app redirects to /admin itself. Wait for that rather than a manual
+  // page.goto('/admin'): the goto fires a navigation that aborts the in-flight login
+  // request, so the auth cookie never lands and RequireRole bounces back to /login.
+  await expect(page).toHaveURL(/\/admin$/);
   await expect(page.getByRole('heading', { name: 'Song management' })).toBeVisible();
 });

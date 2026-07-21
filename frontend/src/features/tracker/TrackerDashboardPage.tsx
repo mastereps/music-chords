@@ -28,9 +28,13 @@ function StaffFlourish() {
 }
 
 export function TrackerDashboardPage() {
-  const { students, addStudent } = useTracker();
+  const { students, addStudent, canEdit, isLoading } = useTracker();
   const navigate = useNavigate();
   const [isAddOpen, setIsAddOpen] = useState(false);
+
+  if (isLoading) {
+    return <p className="mx-auto max-w-6xl text-sm text-studio-muted">Loading students…</p>;
+  }
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -41,27 +45,35 @@ export function TrackerDashboardPage() {
         </div>
         <div className="flex items-center gap-4">
           <StaffFlourish />
-          <button
-            type="button"
-            onClick={() => setIsAddOpen(true)}
-            className="flex items-center gap-2 rounded-full bg-studio-gold px-4 py-2.5 text-sm font-semibold text-white shadow-panel transition hover:bg-studio-gold/90"
-          >
-            <span aria-hidden="true">+</span> Add Student
-          </button>
+          {canEdit ? (
+            <button
+              type="button"
+              onClick={() => setIsAddOpen(true)}
+              className="flex items-center gap-2 rounded-full bg-studio-gold px-4 py-2.5 text-sm font-semibold text-white shadow-panel transition hover:bg-studio-gold/90"
+            >
+              <span aria-hidden="true">+</span> Add Student
+            </button>
+          ) : null}
         </div>
       </div>
 
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {students.map((student) => (
-          <StudentCard key={student.id} student={student} />
-        ))}
-      </div>
+      {students.length === 0 ? (
+        <p className="mt-8 rounded-2xl border border-dashed border-studio-line bg-studio-card px-4 py-10 text-center text-sm text-studio-muted">
+          {canEdit ? 'No students yet. Use “Add Student” to enroll the first one.' : 'No students enrolled yet.'}
+        </p>
+      ) : (
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {students.map((student) => (
+            <StudentCard key={student.id} student={student} />
+          ))}
+        </div>
+      )}
 
       {isAddOpen ? (
         <StudentFormModal
           mode="add"
-          onSubmit={(draft) => {
-            const id = addStudent(draft);
+          onSubmit={async (draft) => {
+            const id = await addStudent(draft);
             setIsAddOpen(false);
             if (id) {
               navigate(`/tracker/students/${id}`);

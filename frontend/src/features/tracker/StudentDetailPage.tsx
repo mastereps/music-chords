@@ -18,7 +18,8 @@ import { DeleteModal } from '../../components/DeleteModal';
 
 export function StudentDetailPage() {
   const { studentId } = useParams();
-  const { students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, updateStudent, deleteStudent } = useTracker();
+  const { students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, updateStudent, deleteStudent, canEdit, isLoading } =
+    useTracker();
   const navigate = useNavigate();
   const [activeChecklistId, setActiveChecklistId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -27,6 +28,10 @@ export function StudentDetailPage() {
   const [isEditingStudent, setIsEditingStudent] = useState(false);
 
   const student = students.find((candidate) => candidate.id === studentId);
+
+  if (isLoading) {
+    return <p className="mx-auto max-w-6xl text-sm text-studio-muted">Loading student…</p>;
+  }
 
   if (!student) {
     return (
@@ -52,20 +57,22 @@ export function StudentDetailPage() {
         <Link to="/tracker" className="text-sm font-semibold text-studio-accent transition hover:opacity-80">
           ← Back to Dashboard
         </Link>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setIsAddOpen(true)}
-            className="flex items-center gap-2 rounded-full bg-studio-accent px-4 py-2.5 text-sm font-semibold text-white shadow-panel transition hover:bg-studio-accent/90"
-          >
-            <span aria-hidden="true">+</span> Add Item
-          </button>
-          <StudentActionsMenu
-            studentName={student.name}
-            onEdit={() => setIsEditingStudent(true)}
-            onDelete={() => setIsDeletingStudent(true)}
-          />
-        </div>
+        {canEdit ? (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsAddOpen(true)}
+              className="flex items-center gap-2 rounded-full bg-studio-accent px-4 py-2.5 text-sm font-semibold text-white shadow-panel transition hover:bg-studio-accent/90"
+            >
+              <span aria-hidden="true">+</span> Add Item
+            </button>
+            <StudentActionsMenu
+              studentName={student.name}
+              onEdit={() => setIsEditingStudent(true)}
+              onDelete={() => setIsDeletingStudent(true)}
+            />
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-6">
@@ -132,7 +139,7 @@ export function StudentDetailPage() {
 
         {checklist.items.length === 0 ? (
           <p className="px-4 py-10 text-center text-sm text-studio-muted">
-            Nothing on this checklist yet. Use “Add Item” to start tracking.
+            {canEdit ? 'Nothing on this checklist yet. Use “Add Item” to start tracking.' : 'Nothing on this checklist yet.'}
           </p>
         ) : (
           KIND_GROUPS.map((group) => {
@@ -153,6 +160,7 @@ export function StudentDetailPage() {
                     onNotesChange={(notes) => setNotes(student.id, checklist.id, item.id, notes)}
                     onDelete={() => setPendingDeleteId(item.id)}
                     onConfirmReview={() => confirmReview(student.id, checklist.id, item.id)}
+                    readOnly={!canEdit}
                   />
                 ))}
               </div>
