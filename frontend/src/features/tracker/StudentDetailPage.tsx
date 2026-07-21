@@ -18,7 +18,7 @@ import { DeleteModal } from '../../components/DeleteModal';
 
 export function StudentDetailPage() {
   const { studentId } = useParams();
-  const { students, setItemStatus, setAttempts, setNotes, addItem, deleteItem, confirmReview, updateStudent, deleteStudent, canEdit, isLoading } =
+  const { students, setItemStatus, setAttempts, setNotes, setItemName, addItem, deleteItem, confirmReview, updateStudent, deleteStudent, canEdit, isLoading } =
     useTracker();
   const navigate = useNavigate();
   const [activeChecklistId, setActiveChecklistId] = useState<string | null>(null);
@@ -158,6 +158,7 @@ export function StudentDetailPage() {
                     onStatusChange={(status) => setItemStatus(student.id, checklist.id, item.id, status)}
                     onAttemptsChange={(attempts) => setAttempts(student.id, checklist.id, item.id, attempts)}
                     onNotesChange={(notes) => setNotes(student.id, checklist.id, item.id, notes)}
+                    onNameChange={(name) => setItemName(student.id, checklist.id, item.id, name)}
                     onDelete={() => setPendingDeleteId(item.id)}
                     onConfirmReview={() => confirmReview(student.id, checklist.id, item.id)}
                     readOnly={!canEdit}

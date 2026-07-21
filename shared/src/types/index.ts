@@ -195,6 +195,7 @@ export interface TrackerItemInput {
 
 /** Every field optional: an empty patch just re-stamps `updatedAt`, which is how review re-confirmation works. */
 export interface TrackerItemPatch {
+  name?: string;
   status?: TrackerItemStatus;
   attempts?: number;
   notes?: string;

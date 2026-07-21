@@ -175,13 +175,14 @@ export async function createItem(checklistId: number, input: TrackerItemInput): 
 export async function updateItem(id: number, patch: TrackerItemPatch): Promise<TrackerItem> {
   const result = await query<ItemRow>(
     `UPDATE tracker_items
-     SET status = COALESCE($2, status),
-         attempts = COALESCE($3, attempts),
-         notes = COALESCE($4, notes),
+     SET name = COALESCE($2, name),
+         status = COALESCE($3, status),
+         attempts = COALESCE($4, attempts),
+         notes = COALESCE($5, notes),
          updated_at = NOW()
      WHERE id = $1
      RETURNING id, checklist_id, kind, name, status, attempts, notes, updated_at`,
-    [id, patch.status ?? null, patch.attempts ?? null, patch.notes ?? null]
+    [id, patch.name ?? null, patch.status ?? null, patch.attempts ?? null, patch.notes ?? null]
   );
 
   return mapItem(assertFound(result.rows[0], 'Checklist item not found'));

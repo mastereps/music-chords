@@ -32,6 +32,8 @@ interface TrackerContextValue {
   setItemStatus: (studentId: string, checklistId: string, itemId: string, status: ItemStatus) => void;
   setAttempts: (studentId: string, checklistId: string, itemId: string, attempts: number) => void;
   setNotes: (studentId: string, checklistId: string, itemId: string, notes: string) => void;
+  /** Renames a checklist item. Ignores an empty name so a row can never lose its label. */
+  setItemName: (studentId: string, checklistId: string, itemId: string, name: string) => void;
   addItem: (studentId: string, checklistId: string, draft: NewItemDraft) => void;
   deleteItem: (studentId: string, checklistId: string, itemId: string) => void;
   /** Re-confirms a passed item today, clearing its review flag. Status and attempts are untouched. */
@@ -152,6 +154,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
         ),
         () =>
           apiClient.updateTrackerItem(Number(itemId), {
+            name: changes.name,
             status: changes.status,
             attempts: changes.attempts,
             notes: changes.notes
@@ -178,6 +181,17 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const setNotes = useCallback(
     (studentId: string, checklistId: string, itemId: string, notes: string) => {
       patchItem(studentId, checklistId, itemId, { notes });
+    },
+    [patchItem]
+  );
+
+  const setItemName = useCallback(
+    (studentId: string, checklistId: string, itemId: string, name: string) => {
+      const trimmed = name.trim();
+      if (trimmed === '') {
+        return;
+      }
+      patchItem(studentId, checklistId, itemId, { name: trimmed });
     },
     [patchItem]
   );
@@ -300,6 +314,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       setItemStatus,
       setAttempts,
       setNotes,
+      setItemName,
       addItem,
       deleteItem,
       confirmReview,
@@ -315,6 +330,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       setItemStatus,
       setAttempts,
       setNotes,
+      setItemName,
       addItem,
       deleteItem,
       confirmReview,

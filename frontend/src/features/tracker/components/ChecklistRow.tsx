@@ -12,6 +12,7 @@ interface ChecklistRowProps {
   onStatusChange: (status: ItemStatus) => void;
   onAttemptsChange: (attempts: number) => void;
   onNotesChange: (notes: string) => void;
+  onNameChange: (name: string) => void;
   onDelete: () => void;
   onConfirmReview: () => void;
   /** Guests and editors get the same table without any of the controls. */
@@ -28,6 +29,7 @@ export function ChecklistRow({
   onStatusChange,
   onAttemptsChange,
   onNotesChange,
+  onNameChange,
   onDelete,
   onConfirmReview,
   readOnly = false
@@ -47,12 +49,50 @@ export function ChecklistRow({
     }
   };
 
+  // The name is edited inline the same way — held locally, saved on blur.
+  const [draftName, setDraftName] = useState(item.name);
+  useEffect(() => {
+    setDraftName(item.name);
+  }, [item.name]);
+
+  const commitName = () => {
+    const trimmed = draftName.trim();
+    if (trimmed === '') {
+      // Never let a row lose its label; snap back to what was saved.
+      setDraftName(item.name);
+      return;
+    }
+    if (trimmed !== item.name) {
+      onNameChange(trimmed);
+    }
+  };
+
   return (
     <div
       className={`relative items-center gap-x-4 gap-y-3 border-b border-studio-line/60 px-4 py-3 transition last:border-b-0 hover:bg-studio-page/60 ${ROW_GRID}`}
     >
       <div className="pr-10 md:pr-0">
-        <p className="font-medium text-studio-ink">{item.name}</p>
+        <FieldLabel>Item</FieldLabel>
+        {readOnly ? (
+          <p className="font-medium text-studio-ink">{item.name}</p>
+        ) : (
+          <input
+            type="text"
+            value={draftName}
+            aria-label={`Name for ${item.name}`}
+            onChange={(event) => setDraftName(event.target.value)}
+            onBlur={commitName}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.currentTarget.blur();
+              } else if (event.key === 'Escape') {
+                setDraftName(item.name);
+                event.currentTarget.blur();
+              }
+            }}
+            className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 -mx-2 font-medium text-studio-ink hover:border-studio-line focus:border-studio-accent/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-studio-accent/20"
+          />
+        )}
         {reviewDue && item.updatedAt ? (
           <span className="mt-1 inline-flex items-center gap-1 rounded-md bg-status-lacking-soft px-1.5 py-0.5 text-[11px] font-semibold text-status-lacking ring-1 ring-status-lacking/20">
             ↻ Review due · passed {daysSince(item.updatedAt)}d ago

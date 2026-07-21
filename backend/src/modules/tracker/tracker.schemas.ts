@@ -21,6 +21,7 @@ export const trackerItemSchema = z.object({
 
 /** All optional — an empty patch is a valid "still passes today" re-confirmation. */
 export const trackerItemPatchSchema = z.object({
+  name: z.string().trim().min(1).max(200).optional(),
   status: z.enum(['not_started', 'lacking', 'passed']).optional(),
   attempts: z.coerce.number().int().min(0).optional(),
   notes: z.string().trim().max(2000).optional()
