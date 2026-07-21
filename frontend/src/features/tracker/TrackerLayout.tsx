@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 
 import { SidebarArt } from './components/SidebarArt';
+import { useTracker } from './TrackerProvider';
 
 /** Only Dashboard and Students lead anywhere; the rest are design placeholders. */
 const NAV_ITEMS = [
@@ -30,6 +31,8 @@ function Wordmark() {
 }
 
 export function TrackerLayout() {
+  const { canEdit, error } = useTracker();
+
   // The chords app defaults <html> to `dark`, but this design is light-only. Suspend the
   // dark class while the tracker is mounted so shared components (e.g. DeleteModal) render
   // light too, then hand the theme back on the way out.
@@ -107,6 +110,18 @@ export function TrackerLayout() {
       </header>
 
       <main className="min-w-0 flex-1 px-4 pb-10 pt-28 sm:px-6 lg:pt-8">
+        {error ? (
+          <p role="alert" className="mx-auto mb-4 max-w-6xl rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 ring-1 ring-red-200">
+            {error}
+          </p>
+        ) : null}
+
+        {canEdit ? null : (
+          <p className="mx-auto mb-4 max-w-6xl rounded-xl bg-studio-card px-4 py-2.5 text-sm text-studio-muted ring-1 ring-studio-line">
+            You are viewing the tracker. <Link to="/login" className="font-semibold text-studio-accent hover:underline">Sign in as an admin</Link> to make changes.
+          </p>
+        )}
+
         <Outlet />
       </main>
     </div>

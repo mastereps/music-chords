@@ -14,7 +14,12 @@ import type {
   SongRevision,
   SongSummary,
   SuggestionInput,
-  Tag
+  Tag,
+  TrackerItem,
+  TrackerItemInput,
+  TrackerItemPatch,
+  TrackerStudent,
+  TrackerStudentInput
 } from '@music-chords/shared';
 
 export interface DashboardStats {
@@ -292,6 +297,45 @@ export const apiClient = {
   },
   async deleteResource(id: number) {
     await request(`/api/resources/${id}`, { method: 'DELETE' });
+  },
+  async getTrackerStudents(signal?: AbortSignal) {
+    const data = await request<{ items: TrackerStudent[] }>('/api/tracker/students', { signal });
+    return data.items;
+  },
+  async createTrackerStudent(input: TrackerStudentInput) {
+    const data = await request<{ item: TrackerStudent }>('/api/tracker/students', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+    return data.item;
+  },
+  async updateTrackerStudent(id: number, input: TrackerStudentInput) {
+    const data = await request<{ item: TrackerStudent }>(`/api/tracker/students/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input)
+    });
+    return data.item;
+  },
+  async deleteTrackerStudent(id: number) {
+    await request(`/api/tracker/students/${id}`, { method: 'DELETE' });
+  },
+  async createTrackerItem(checklistId: number, input: TrackerItemInput) {
+    const data = await request<{ item: TrackerItem }>(`/api/tracker/checklists/${checklistId}/items`, {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+    return data.item;
+  },
+  /** An empty patch re-stamps `updatedAt` only — that is how a stale "passed" item is re-confirmed. */
+  async updateTrackerItem(id: number, patch: TrackerItemPatch) {
+    const data = await request<{ item: TrackerItem }>(`/api/tracker/items/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch)
+    });
+    return data.item;
+  },
+  async deleteTrackerItem(id: number) {
+    await request(`/api/tracker/items/${id}`, { method: 'DELETE' });
   },
   async updateLiveState(input: LiveStateInput) {
     const data = await request<{ item: LiveState }>('/api/live/state', {

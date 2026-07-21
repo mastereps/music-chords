@@ -151,3 +151,51 @@ export interface LiveStateInput {
   scrollPct?: number;
   songView?: LiveSongView | null;
 }
+
+export type TrackerItemStatus = 'not_started' | 'lacking' | 'passed';
+export type TrackerItemKind = 'skill' | 'piece' | 'passage';
+
+export interface TrackerItem {
+  id: number;
+  kind: TrackerItemKind;
+  name: string;
+  status: TrackerItemStatus;
+  attempts: number;
+  notes: string;
+  /** Doubles as the review clock — the tracker measures staleness from this. */
+  updatedAt: string;
+}
+
+export interface TrackerChecklist {
+  id: number;
+  name: string;
+  items: TrackerItem[];
+}
+
+export interface TrackerStudent {
+  id: number;
+  name: string;
+  /** Free-form so the frontend instrument registry stays the only place instruments are declared. */
+  instrument: string;
+  checklists: TrackerChecklist[];
+}
+
+export interface TrackerStudentInput {
+  name: string;
+  instrument: string;
+}
+
+export interface TrackerItemInput {
+  kind: TrackerItemKind;
+  name: string;
+  status: TrackerItemStatus;
+  attempts: number;
+  notes: string;
+}
+
+/** Every field optional: an empty patch just re-stamps `updatedAt`, which is how review re-confirmation works. */
+export interface TrackerItemPatch {
+  status?: TrackerItemStatus;
+  attempts?: number;
+  notes?: string;
+}
