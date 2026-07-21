@@ -12,5 +12,11 @@ export default defineConfig({
   },
   server: {
     port: 5173
+  },
+  // `vite preview` otherwise binds 4173, but the Playwright e2e (and its baseURL) wait on 5173.
+  // Pin it so the preview server the tests boot is the one they connect to.
+  preview: {
+    port: 5173,
+    strictPort: true
   }
 });
