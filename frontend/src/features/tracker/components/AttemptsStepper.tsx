@@ -19,7 +19,7 @@ export function AttemptsStepper({ value, onChange, label, disabled = false }: At
   }
 
   return (
-    <div className="inline-flex items-center gap-1 rounded-lg border border-studio-line bg-white px-1 py-0.5">
+    <div className="inline-flex items-center gap-1 rounded-lg border border-studio-line bg-studio-page px-1 py-0.5">
       <button type="button" aria-label={`Decrease ${label}`} disabled={value <= 0} onClick={() => onChange(value - 1)} className={BUTTON_CLASSES}>
         −
       </button>

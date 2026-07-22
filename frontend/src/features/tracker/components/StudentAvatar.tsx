@@ -18,15 +18,19 @@ export function StudentAvatar({ initials, instrument, size = 'lg' }: StudentAvat
   return (
     <div className="relative shrink-0">
       <div
-        style={{ backgroundColor: style.tint, color: style.color }}
-        className={`flex items-center justify-center rounded-full font-display font-semibold ring-4 ring-white ${dimensions.circle}`}
+        style={{
+          background: `linear-gradient(150deg, ${style.color}, ${style.color}bb)`,
+          color: '#fff',
+          boxShadow: `0 0 28px ${style.color}66`
+        }}
+        className={`flex items-center justify-center rounded-full font-display font-semibold ring-2 ring-white/10 ${dimensions.circle}`}
       >
         {initials}
       </div>
       <span
         aria-hidden="true"
-        style={{ boxShadow: `0 0 0 1px ${style.color}40` }}
-        className={`absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-white ${dimensions.badge}`}
+        style={{ boxShadow: `0 0 0 1px ${style.color}55` }}
+        className={`absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-studio-card ${dimensions.badge}`}
       >
         {style.badge}
       </span>

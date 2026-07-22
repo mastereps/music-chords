@@ -16,7 +16,7 @@ interface StudentFormModalProps {
 }
 
 const FIELD_CLASSES =
-  'w-full rounded-xl border border-studio-line bg-white px-3 py-2.5 text-sm text-studio-ink placeholder:text-studio-muted/70 focus:border-studio-accent/50 focus:outline-none focus:ring-2 focus:ring-studio-accent/20';
+  'w-full rounded-xl border border-studio-line bg-studio-page px-3 py-2.5 text-sm text-studio-ink placeholder:text-studio-muted/70 focus:border-studio-accent/50 focus:outline-none focus:ring-2 focus:ring-studio-accent/20';
 
 const LABEL_CLASSES = 'mb-1.5 block text-xs font-semibold text-studio-muted';
 
@@ -45,8 +45,8 @@ export function StudentFormModal({ mode, initialName = '', initialInstrument = '
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 p-4 sm:items-center">
-      <div role="dialog" aria-modal="true" aria-labelledby="student-form-title" className="w-full max-w-lg rounded-3xl bg-studio-card p-6 shadow-panel">
+    <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center">
+      <div role="dialog" aria-modal="true" aria-labelledby="student-form-title" className="w-full max-w-lg rounded-3xl border border-studio-line bg-studio-card p-6 shadow-panel">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 id="student-form-title" className={`font-display text-2xl font-semibold ${accent}`}>
@@ -68,7 +68,7 @@ export function StudentFormModal({ mode, initialName = '', initialInstrument = '
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-5 rounded-2xl border border-studio-line bg-white/60 p-4">
+        <form onSubmit={handleSubmit} className="mt-5 rounded-2xl border border-studio-line bg-white/5 p-4">
           <div className="flex items-center gap-4">
             <StudentAvatar initials={name.trim() === '' ? '?' : initialsFor(name)} instrument={instrument} size="sm" />
             <div className="min-w-0 flex-1">
@@ -110,7 +110,7 @@ export function StudentFormModal({ mode, initialName = '', initialInstrument = '
           {isEdit ? null : <p className="mt-3 text-xs text-studio-muted">Checklists: {DEFAULT_CHECKLIST_NAMES.join(', ')}</p>}
 
           {error ? (
-            <p role="alert" className="mt-3 text-sm font-medium text-red-600">
+            <p role="alert" className="mt-3 text-sm font-medium text-red-400">
               {error}
             </p>
           ) : null}

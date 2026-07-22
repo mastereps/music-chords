@@ -26,7 +26,7 @@ export function StatusSelect({ value, onChange, label, disabled = false }: Statu
         }`}
       >
         {ITEM_STATUSES.map((status) => (
-          <option key={status} value={status} className="bg-white text-studio-ink">
+          <option key={status} value={status} className="bg-studio-card text-studio-ink">
             {STATUS_LABELS[status]}
           </option>
         ))}

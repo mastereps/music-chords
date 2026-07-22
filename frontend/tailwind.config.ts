@@ -18,24 +18,26 @@ export default {
           800: '#29371e',
           900: '#1d2715'
         },
+        // Dark cosmic-violet theme. These tokens are used only inside the tracker feature,
+        // so redefining them here reskins the whole tracker without touching every component.
         studio: {
-          page: '#FBF7EC',
-          card: '#FFFDF7',
-          sidebar: '#F7F1E0',
-          line: '#EFE6D2',
-          lavender: '#F3F0FC',
-          accent: '#7C5CD6',
-          gold: '#A9762F',
-          ink: '#3B322A',
-          muted: '#8A7C6B'
+          page: '#0b0912',
+          card: '#161226',
+          sidebar: '#0e0b1a',
+          line: '#2a2542',
+          lavender: '#1b1730',
+          accent: '#8b5cf6',
+          gold: '#d9b45c',
+          ink: '#ecebf7',
+          muted: '#948eb2'
         },
         status: {
-          passed: '#3F9A62',
-          'passed-soft': '#E6F4EB',
-          lacking: '#C98A18',
-          'lacking-soft': '#FCF1DC',
-          'not-started': '#8A8580',
-          'not-started-soft': '#F0EDE7'
+          passed: '#4ade80',
+          'passed-soft': '#122a1d',
+          lacking: '#fbbf24',
+          'lacking-soft': '#2b2410',
+          'not-started': '#a5a3b5',
+          'not-started-soft': '#1e1b2c'
         }
       },
       fontFamily: {
@@ -44,7 +46,7 @@ export default {
         display: ['"Fraunces"', 'Georgia', 'serif']
       },
       boxShadow: {
-        panel: '0 12px 28px rgba(41, 37, 36, 0.08)'
+        panel: '0 18px 44px rgba(0, 0, 0, 0.5)'
       }
     }
   },

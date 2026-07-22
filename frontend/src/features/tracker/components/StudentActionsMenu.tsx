@@ -54,7 +54,7 @@ export function StudentActionsMenu({ studentName, onEdit, onDelete }: StudentAct
                 setIsOpen(false);
                 onDelete();
               }}
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-red-400 transition hover:bg-red-500/10"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                 <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />

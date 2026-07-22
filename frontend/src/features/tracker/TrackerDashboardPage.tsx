@@ -9,12 +9,12 @@ import { useTracker } from './TrackerProvider';
 function StaffFlourish() {
   return (
     <svg viewBox="0 0 260 70" aria-hidden="true" className="hidden h-16 w-64 shrink-0 md:block">
-      <g stroke="#D9CDB0" strokeWidth="1.3" fill="none">
+      <g stroke="#4a4468" strokeWidth="1.3" fill="none">
         <path d="M4 20c40-12 80 8 124-4s90 6 128-6" />
         <path d="M4 32c40-12 80 8 124-4s90 6 128-6" />
         <path d="M4 44c40-12 80 8 124-4s90 6 128-6" />
       </g>
-      <g fill="#C9B892">
+      <g fill="#6f68a0">
         <circle cx="70" cy="30" r="4.5" />
         <rect x="73.4" y="12" width="1.6" height="19" />
         <circle cx="150" cy="24" r="4.5" />
@@ -49,7 +49,7 @@ export function TrackerDashboardPage() {
             <button
               type="button"
               onClick={() => setIsAddOpen(true)}
-              className="flex items-center gap-2 rounded-full bg-studio-gold px-4 py-2.5 text-sm font-semibold text-white shadow-panel transition hover:bg-studio-gold/90"
+              className="flex items-center gap-2 rounded-full bg-studio-accent px-4 py-2.5 text-sm font-semibold text-white shadow-panel transition hover:bg-studio-accent/90"
             >
               <span aria-hidden="true">+</span> Add Student
             </button>

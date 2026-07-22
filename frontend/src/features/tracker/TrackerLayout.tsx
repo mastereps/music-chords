@@ -33,24 +33,29 @@ function Wordmark() {
 export function TrackerLayout() {
   const { canEdit, error } = useTracker();
 
-  // The chords app defaults <html> to `dark`, but this design is light-only. Suspend the
-  // dark class while the tracker is mounted so shared components (e.g. DeleteModal) render
-  // light too, then hand the theme back on the way out.
+  // This tracker is a dark-only design. Force the `dark` class on while it is mounted so shared
+  // components (e.g. DeleteModal) render dark too, then restore whatever was there on the way out.
   useEffect(() => {
     const root = document.documentElement;
     const wasDark = root.classList.contains('dark');
-    root.classList.remove('dark');
+    root.classList.add('dark');
 
     return () => {
-      if (wasDark) {
-        root.classList.add('dark');
+      if (!wasDark) {
+        root.classList.remove('dark');
       }
     };
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-studio-page font-sans text-studio-ink">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-studio-line bg-studio-sidebar lg:flex">
+    <div
+      className="flex min-h-screen font-sans text-studio-ink"
+      style={{
+        background:
+          'radial-gradient(1100px 600px at 82% -8%, rgba(139, 92, 246, 0.16), transparent 60%), radial-gradient(900px 520px at 8% 108%, rgba(124, 92, 214, 0.12), transparent 60%), radial-gradient(700px 400px at 95% 20%, rgba(214, 90, 90, 0.06), transparent 55%), #0b0912'
+      }}
+    >
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-studio-line/70 bg-studio-sidebar/80 backdrop-blur-sm lg:flex">
         <div className="px-5 py-6">
           <Wordmark />
         </div>
@@ -62,7 +67,11 @@ export function TrackerLayout() {
                 to={item.to}
                 end={item.to === '/tracker'}
                 className={({ isActive }) =>
-                  `${ITEM_BASE} ${isActive ? 'bg-[#F2E3C4] font-semibold text-studio-ink' : 'text-studio-ink/80 hover:bg-studio-line/70'}`
+                  `${ITEM_BASE} ${
+                    isActive
+                      ? 'bg-gradient-to-r from-studio-accent/30 to-studio-accent/10 font-semibold text-white ring-1 ring-studio-accent/40'
+                      : 'text-studio-ink/70 hover:bg-white/5 hover:text-studio-ink'
+                  }`
                 }
               >
                 <span aria-hidden="true">{item.icon}</span>
@@ -81,7 +90,7 @@ export function TrackerLayout() {
         </div>
       </aside>
 
-      <header className="fixed inset-x-0 top-0 z-20 border-b border-studio-line bg-studio-sidebar/95 backdrop-blur lg:hidden">
+      <header className="fixed inset-x-0 top-0 z-20 border-b border-studio-line/70 bg-studio-sidebar/90 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <Wordmark />
         </div>
@@ -94,7 +103,7 @@ export function TrackerLayout() {
                 end={item.to === '/tracker'}
                 className={({ isActive }) =>
                   `shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                    isActive ? 'bg-[#F2E3C4] text-studio-ink' : 'text-studio-ink/70 hover:bg-studio-line/70'
+                    isActive ? 'bg-studio-accent/25 text-white ring-1 ring-studio-accent/40' : 'text-studio-ink/70 hover:bg-white/5'
                   }`
                 }
               >
@@ -111,7 +120,7 @@ export function TrackerLayout() {
 
       <main className="min-w-0 flex-1 px-4 pb-10 pt-28 sm:px-6 lg:pt-8">
         {error ? (
-          <p role="alert" className="mx-auto mb-4 max-w-6xl rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 ring-1 ring-red-200">
+          <p role="alert" className="mx-auto mb-4 max-w-6xl rounded-xl bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300 ring-1 ring-red-500/30">
             {error}
           </p>
         ) : null}
